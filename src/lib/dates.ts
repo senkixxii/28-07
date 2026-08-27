@@ -87,13 +87,17 @@ export interface NextAnniversaryInfo {
   daysUntil: number
 }
 
-/** The next upcoming monthly anniversary (strictly after `now`, unless it is today), in Thailand time. */
+/**
+ * The next monthly anniversary that hasn't happened yet, in Thailand time.
+ * Always strictly in the future — even on the day the current anniversary
+ * lands, this points to the following month, so a countdown built on it
+ * keeps ticking instead of sitting frozen at zero for the rest of that day.
+ */
 export function getNextAnniversary(start: Date, now: Date = new Date()): NextAnniversaryInfo {
   const s = toThaiWallClock(start)
   const n = toThaiWallClock(now)
-  const current = getCurrentAnniversary(start, now)
-  const monthNumber = current.isToday ? current.monthNumber : current.monthNumber + 1
-  const wallClockDate = current.isToday ? toThaiWallClock(current.date) : addMonths(s, monthNumber)
+  const monthNumber = monthsElapsed(start, now) + 1
+  const wallClockDate = addMonths(s, monthNumber)
   return {
     monthNumber,
     date: thaiMidnightInstant(wallClockDate),

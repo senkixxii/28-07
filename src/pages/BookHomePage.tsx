@@ -25,7 +25,7 @@ export default function BookHomePage() {
     )
   }
 
-  const startDate = settings?.relationship_start_date ? new Date(settings.relationship_start_date) : null
+  const startDate = settings?.relationship_start_date ? parseThaiDateOnly(settings.relationship_start_date) : null
   const current = startDate ? getCurrentAnniversary(startDate, now) : null
   const next = startDate ? getNextAnniversary(startDate, now) : null
 
@@ -61,11 +61,20 @@ export default function BookHomePage() {
         </div>
       </Card>
 
+      {current?.isToday && (
+        <Card className="mb-6 text-center">
+          <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-ink">
+            <Sparkles className="h-4 w-4 text-accent" />
+            วันนี้แหละ ครบรอบ {current.monthNumber} เดือนของเรา! 🎉
+          </p>
+        </Card>
+      )}
+
       {next && (
         <Card className="mb-6 text-center">
           <p className="mb-1 flex items-center justify-center gap-1.5 text-sm font-medium text-ink">
             <Sparkles className="h-4 w-4 text-accent" />
-            {next.daysUntil > 0 ? `อีก ${next.daysUntil} วัน` : 'วันนี้แหละ'} จะถึงวันครบรอบของเรา 💕
+            อีก {next.daysUntil} วัน จะถึงวันครบรอบของเรา 💕
           </p>
           <div className="mt-4">
             <CountdownDisplay target={next.date} />
