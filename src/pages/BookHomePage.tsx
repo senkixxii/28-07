@@ -1,21 +1,30 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import { BookHeart, Image as ImageIcon, Mail, Sparkles } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import Skeleton from '@/components/ui/Skeleton'
 import BearIllustration from '@/components/bear/BearIllustration'
 import PageLoader from '@/components/bear/PageLoader'
 import CountdownDisplay from '@/components/book/CountdownDisplay'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 import { useAnniversaries } from '@/hooks/useAnniversaries'
+import { useMemoryTimeline } from '@/hooks/useMemoryTimeline'
 import { useNow } from '@/hooks/useCountdown'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { getCurrentAnniversary, getNextAnniversary, formatThaiDate, parseThaiDateOnly } from '@/lib/dates'
+import { getCurrentAnniversary, getNextAnniversary, formatThaiDate, formatShortDate, parseThaiDateOnly } from '@/lib/dates'
+
+const TIMELINE_META = {
+  anniversary: { icon: BookHeart, label: 'ครบรอบ' },
+  letter: { icon: Mail, label: 'จดหมาย' },
+  photo: { icon: ImageIcon, label: 'รูปภาพ' },
+} as const
 
 export default function BookHomePage() {
   const { settings, loading: settingsLoading } = useCoupleSettings()
   const { anniversaries, loading: anniversariesLoading } = useAnniversaries()
+  const { entries: timelineEntries, loading: timelineLoading } = useMemoryTimeline()
   const now = useNow(1000)
   const reducedMotion = useReducedMotion()
 
@@ -35,6 +44,8 @@ export default function BookHomePage() {
     ? anniversaries.find((a) => a.month_number === current.monthNumber) ??
       [...anniversaries].reverse().find((a) => parseThaiDateOnly(a.anniversary_date) <= now)
     : anniversaries[anniversaries.length - 1]
+
+  const recentTimelineEntries = timelineEntries.slice(-8)
 
   const fadeUp = (delay: number) => ({
     initial: reducedMotion ? undefined : { opacity: 0, y: 14 },
@@ -120,6 +131,59 @@ export default function BookHomePage() {
               <Button className="mt-4">+ เขียนหน้าครบรอบ</Button>
             </Link>
           </Card>
+        )}
+      </motion.div>
+
+      <motion.div {...fadeUp(0.26)} className="mt-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-ink">ไทม์ไลน์ความทรงจำ</h3>
+          <Link to="/memory-book" className="text-xs font-medium text-accent hover:underline">
+            ดูทั้งหมด →
+          </Link>
+        </div>
+
+        {timelineLoading ? (
+          <Skeleton className="h-24 w-full" />
+        ) : recentTimelineEntries.length === 0 ? (
+          <Card className="text-center">
+            <p className="text-sm text-ink-soft">🐻 ยังไม่มีความทรงจำในไทม์ไลน์เลยนะ</p>
+          </Card>
+        ) : (
+          <div className="overflow-x-auto pb-2">
+            <div className="flex min-w-max items-start">
+              {recentTimelineEntries.map((entry, i) => {
+                const { icon: Icon, label } = TIMELINE_META[entry.kind]
+                const isNewest = i === recentTimelineEntries.length - 1
+                return (
+                  <motion.div
+                    key={entry.id}
+                    initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.32 + i * 0.05 }}
+                    className="flex w-20 flex-col items-center"
+                  >
+                    <div className="flex w-full items-center">
+                      <span className={`h-px flex-1 ${i === 0 ? 'bg-transparent' : 'bg-black/10'}`} />
+                      <Link
+                        to={entry.linkTo}
+                        aria-label={entry.title || label}
+                        className={`group relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full shadow-softer ring-2 transition-transform hover:scale-110 active:scale-95 ${
+                          isNewest ? 'bg-accent text-white ring-accent' : 'bg-warm-white text-accent ring-[var(--accent-bg)]'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </Link>
+                      <span className={`h-px flex-1 ${isNewest ? 'bg-transparent' : 'bg-black/10'}`} />
+                    </div>
+                    <Link to={entry.linkTo} className="mt-2 block w-full text-center">
+                      <p className="truncate text-[11px] text-ink-muted">{formatShortDate(entry.date)}</p>
+                      <p className="truncate text-xs font-medium text-ink">{entry.title || label}</p>
+                    </Link>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </div>
         )}
       </motion.div>
     </AppShell>
