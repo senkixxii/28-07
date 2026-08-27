@@ -1,22 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCouple } from '@/contexts/CoupleContext'
 import type { Anniversary, AnniversaryImage, AnniversaryWithImages } from '@/types'
 
 export function useAnniversaries() {
   const { user } = useAuth()
+  const { coupleId } = useCouple()
   const [anniversaries, setAnniversaries] = useState<AnniversaryWithImages[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   const refresh = useCallback(async () => {
-    if (!user) return
+    if (!coupleId) return
     setLoading(true)
     setError(null)
     const { data, error: err } = await supabase
       .from('anniversaries')
       .select('*, anniversary_images(*)')
-      .eq('user_id', user.id)
+      .eq('couple_id', coupleId)
       .order('anniversary_date', { ascending: true })
 
     if (err) setError(err)
@@ -28,24 +30,24 @@ export function useAnniversaries() {
       setAnniversaries(sorted)
     }
     setLoading(false)
-  }, [user])
+  }, [coupleId])
 
   useEffect(() => {
     refresh()
   }, [refresh])
 
   const createAnniversary = useCallback(
-    async (input: Omit<Anniversary, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-      if (!user) throw new Error('not authenticated')
+    async (input: Omit<Anniversary, 'id' | 'user_id' | 'couple_id' | 'created_at' | 'updated_at'>) => {
+      if (!user || !coupleId) throw new Error('not authenticated')
       const { data, error: err } = await supabase
         .from('anniversaries')
-        .insert({ ...input, user_id: user.id })
+        .insert({ ...input, user_id: user.id, couple_id: coupleId })
         .select('*')
         .single()
       if (err) throw err
       return data
     },
-    [user],
+    [user, coupleId],
   )
 
   const updateAnniversary = useCallback(async (id: string, patch: Partial<Anniversary>) => {
@@ -64,11 +66,19 @@ export function useAnniversaries() {
     if (err) throw err
   }, [])
 
-  const addAnniversaryImage = useCallback(async (input: Omit<AnniversaryImage, 'id' | 'created_at'>) => {
-    const { data, error: err } = await supabase.from('anniversary_images').insert(input).select('*').single()
-    if (err) throw err
-    return data
-  }, [])
+  const addAnniversaryImage = useCallback(
+    async (input: Omit<AnniversaryImage, 'id' | 'created_at' | 'user_id' | 'couple_id'>) => {
+      if (!user || !coupleId) throw new Error('not authenticated')
+      const { data, error: err } = await supabase
+        .from('anniversary_images')
+        .insert({ ...input, user_id: user.id, couple_id: coupleId })
+        .select('*')
+        .single()
+      if (err) throw err
+      return data
+    },
+    [user, coupleId],
+  )
 
   const removeAnniversaryImage = useCallback(async (id: string) => {
     const { error: err } = await supabase.from('anniversary_images').delete().eq('id', id)
@@ -96,20 +106,20 @@ export function useAnniversaries() {
 }
 
 export function useAnniversary(id: string | undefined) {
-  const { user } = useAuth()
+  const { coupleId } = useCouple()
   const [anniversary, setAnniversary] = useState<AnniversaryWithImages | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   const refresh = useCallback(async () => {
-    if (!user || !id) return
+    if (!coupleId || !id) return
     setLoading(true)
     setError(null)
     const { data, error: err } = await supabase
       .from('anniversaries')
       .select('*, anniversary_images(*)')
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('couple_id', coupleId)
       .maybeSingle()
 
     if (err) setError(err)
@@ -122,7 +132,7 @@ export function useAnniversary(id: string | undefined) {
       setAnniversary(null)
     }
     setLoading(false)
-  }, [user, id])
+  }, [coupleId, id])
 
   useEffect(() => {
     refresh()

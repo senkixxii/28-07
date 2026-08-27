@@ -14,7 +14,7 @@ import MemoryPhotoLayout from '@/components/anniversary/MemoryPhotoLayout'
 import { useAnniversary, useAnniversaries } from '@/hooks/useAnniversaries'
 import { useAuth } from '@/contexts/AuthContext'
 import { friendlyError } from '@/lib/supabase'
-import { deleteLoveBookFolder } from '@/lib/storage'
+import { deleteLoveBookImage } from '@/lib/storage'
 import { formatThaiDate } from '@/lib/dates'
 
 const ROTATIONS = [-4, 3, -2, 4, -3, 2]
@@ -59,7 +59,7 @@ export default function AnniversaryDetailPage() {
     setDeleting(true)
     try {
       await deleteAnniversary(anniversary.id)
-      await deleteLoveBookFolder(user.id, `anniversaries/${anniversary.id}`)
+      await Promise.all(anniversary.anniversary_images.map((img) => deleteLoveBookImage(img.storage_path)))
       toast.success('ลบหน้าความทรงจำแล้วนะ')
       navigate('/anniversaries')
     } catch (err) {

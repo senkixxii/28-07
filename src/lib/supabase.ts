@@ -41,5 +41,11 @@ export function friendlyError(error: unknown): string {
     return 'เชื่อมต่ออินเทอร์เน็ตไม่ได้ ลองเช็คสัญญาณดูนะ 📶'
   }
 
+  // Our own Postgres functions (e.g. join_couple) raise messages already
+  // written in Thai for the user — pass those through as-is.
+  if (/[฀-๿]/.test(message)) {
+    return message
+  }
+
   return 'เกิดอะไรขึ้นนิดหน่อย 🐻 ลองใหม่อีกครั้งนะ'
 }

@@ -21,6 +21,7 @@ export type Database = {
       anniversaries: {
         Row: {
           anniversary_date: string
+          couple_id: string
           cover_image_url: string | null
           created_at: string
           id: string
@@ -33,6 +34,7 @@ export type Database = {
         }
         Insert: {
           anniversary_date: string
+          couple_id: string
           cover_image_url?: string | null
           created_at?: string
           id?: string
@@ -45,6 +47,7 @@ export type Database = {
         }
         Update: {
           anniversary_date?: string
+          couple_id?: string
           cover_image_url?: string | null
           created_at?: string
           id?: string
@@ -55,11 +58,20 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "anniversaries_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       anniversary_images: {
         Row: {
           anniversary_id: string
+          couple_id: string
           created_at: string
           id: string
           image_url: string
@@ -69,6 +81,7 @@ export type Database = {
         }
         Insert: {
           anniversary_id: string
+          couple_id: string
           created_at?: string
           id?: string
           image_url: string
@@ -78,6 +91,7 @@ export type Database = {
         }
         Update: {
           anniversary_id?: string
+          couple_id?: string
           created_at?: string
           id?: string
           image_url?: string
@@ -93,10 +107,47 @@ export type Database = {
             referencedRelation: "anniversaries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "anniversary_images_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couple_members: {
+        Row: {
+          couple_id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          couple_id: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          couple_id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_members_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
         ]
       }
       couple_settings: {
         Row: {
+          couple_id: string
           couple_photo_url: string | null
           created_at: string
           id: string
@@ -106,9 +157,9 @@ export type Database = {
           partner_name: string
           relationship_start_date: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
+          couple_id: string
           couple_photo_url?: string | null
           created_at?: string
           id?: string
@@ -118,9 +169,9 @@ export type Database = {
           partner_name?: string
           relationship_start_date?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
+          couple_id?: string
           couple_photo_url?: string | null
           created_at?: string
           id?: string
@@ -130,13 +181,39 @@ export type Database = {
           partner_name?: string
           relationship_start_date?: string | null
           updated_at?: string
-          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_settings_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: true
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couples: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
         }
         Relationships: []
       }
       gallery_images: {
         Row: {
           caption: string | null
+          couple_id: string
           created_at: string
           id: string
           image_url: string
@@ -145,6 +222,7 @@ export type Database = {
         }
         Insert: {
           caption?: string | null
+          couple_id: string
           created_at?: string
           id?: string
           image_url: string
@@ -153,16 +231,26 @@ export type Database = {
         }
         Update: {
           caption?: string | null
+          couple_id?: string
           created_at?: string
           id?: string
           image_url?: string
           storage_path?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gallery_images_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       letters: {
         Row: {
+          couple_id: string
           created_at: string
           id: string
           image_url: string | null
@@ -173,6 +261,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          couple_id: string
           created_at?: string
           id?: string
           image_url?: string | null
@@ -183,6 +272,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          couple_id?: string
           created_at?: string
           id?: string
           image_url?: string | null
@@ -192,7 +282,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "letters_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -226,7 +324,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      join_couple: { Args: { p_invite_code: string }; Returns: string }
+      my_couple_id: { Args: never; Returns: string }
+      regenerate_invite_code: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

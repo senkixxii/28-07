@@ -52,10 +52,3 @@ export async function deleteLoveBookImage(storagePath: string): Promise<void> {
   const { error } = await supabase.storage.from(BUCKET).remove([storagePath])
   if (error) throw error
 }
-
-export async function deleteLoveBookFolder(userId: string, folder: string): Promise<void> {
-  const { data, error } = await supabase.storage.from(BUCKET).list(`${userId}/${folder}`)
-  if (error || !data || data.length === 0) return
-  const paths = data.map((f) => `${userId}/${folder}/${f.name}`)
-  await supabase.storage.from(BUCKET).remove(paths)
-}
