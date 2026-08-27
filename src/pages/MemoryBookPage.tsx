@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BookHeart, ChevronLeft, ChevronRight, Image as ImageIcon, Mail } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
-import PaperPage from '@/components/book/PaperPage'
 import Lightbox from '@/components/ui/Lightbox'
 import PageLoader from '@/components/bear/PageLoader'
 import EmptyState from '@/components/bear/EmptyState'
@@ -78,15 +77,23 @@ export default function MemoryBookPage() {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformStyle: 'preserve-3d' }}
           >
-            <PaperPage className="grid grid-cols-1 gap-6 p-6 sm:p-8 lg:grid-cols-2">
-              <MemoryPhotoLayout
-                images={current.images}
-                layout={current.layout}
-                alt={current.title}
-                onImageClick={setLightboxIndex}
-              />
+            <div className="relative grid grid-cols-1 overflow-hidden rounded-xl3 border border-black/5 bg-warm-white shadow-page sm:grid-cols-2">
+              {/* spine shadow down the middle, like an open book's gutter */}
+              <div className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-10 -translate-x-1/2 bg-gradient-to-r from-black/10 via-transparent to-black/10 sm:block" />
 
-              <div className="flex flex-col justify-center">
+              {/* Left page */}
+              <div className="paper-texture relative flex items-center justify-center border-b border-black/5 p-6 sm:border-b-0 sm:border-r sm:p-8">
+                <MemoryPhotoLayout
+                  images={current.images}
+                  layout={current.layout}
+                  alt={current.title}
+                  onImageClick={setLightboxIndex}
+                  className="w-full max-w-sm"
+                />
+              </div>
+
+              {/* Right page */}
+              <div className="paper-texture flex flex-col justify-center p-6 sm:p-8 lg:p-10">
                 <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--accent-bg)]/60 px-3 py-1 text-xs font-medium text-ink">
                   <Icon className="h-3.5 w-3.5" /> {KIND_META[current.kind].label}
                 </span>
@@ -98,7 +105,7 @@ export default function MemoryBookPage() {
                   เปิดดูต้นฉบับ →
                 </Link>
               </div>
-            </PaperPage>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
