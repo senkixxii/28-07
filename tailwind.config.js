@@ -20,7 +20,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Anuphan', 'Noto Sans Thai', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Prompt', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         xl2: '1.25rem',
