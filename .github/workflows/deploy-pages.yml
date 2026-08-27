@@ -47,6 +47,9 @@ jobs:
     steps:
       # Creates/enables the Pages site (build type "workflow") on first run
       # if it doesn't already exist — deploy-pages alone doesn't do this.
+      # enablement defaults to false, so it must be set explicitly.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - id: deployment
         uses: actions/deploy-pages@v4
