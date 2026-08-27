@@ -132,6 +132,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
           const uploaded = await uploadLoveBookImage(user.id, `anniversaries/${anniversaryId}`, img.file)
           await addAnniversaryImage({
             anniversary_id: anniversaryId,
+            user_id: user.id,
             image_url: uploaded.imageUrl,
             storage_path: uploaded.storagePath,
             sort_order: existingImages.length + pending.indexOf(img),

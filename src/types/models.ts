@@ -4,8 +4,6 @@ type Tables = Database['public']['Tables']
 
 export type Profile = Tables['profiles']['Row']
 export type CoupleSettings = Tables['couple_settings']['Row']
-export type Couple = Tables['couples']['Row']
-export type CoupleMember = Tables['couple_members']['Row']
 export type AnniversaryImage = Tables['anniversary_images']['Row']
 export type Letter = Tables['letters']['Row']
 export type GalleryImage = Tables['gallery_images']['Row']

@@ -1,22 +1,22 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useCouple } from '@/contexts/CoupleContext'
+import { useAuth } from '@/contexts/AuthContext'
 import type { CoupleSettings } from '@/types'
 
 export function useCoupleSettings() {
-  const { coupleId } = useCouple()
+  const { user } = useAuth()
   const [settings, setSettings] = useState<CoupleSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
 
   const refresh = useCallback(async () => {
-    if (!coupleId) return
+    if (!user) return
     setLoading(true)
     setError(null)
     const { data, error: err } = await supabase
       .from('couple_settings')
       .select('*')
-      .eq('couple_id', coupleId)
+      .eq('user_id', user.id)
       .maybeSingle()
 
     if (err) {
@@ -24,7 +24,7 @@ export function useCoupleSettings() {
     } else if (!data) {
       const { data: created, error: createErr } = await supabase
         .from('couple_settings')
-        .insert({ couple_id: coupleId })
+        .insert({ user_id: user.id })
         .select('*')
         .single()
       if (createErr) setError(createErr)
@@ -33,7 +33,7 @@ export function useCoupleSettings() {
       setSettings(data)
     }
     setLoading(false)
-  }, [coupleId])
+  }, [user])
 
   useEffect(() => {
     refresh()
@@ -41,18 +41,18 @@ export function useCoupleSettings() {
 
   const updateSettings = useCallback(
     async (patch: Partial<CoupleSettings>) => {
-      if (!coupleId) return
+      if (!user) return
       const { data, error: err } = await supabase
         .from('couple_settings')
         .update(patch)
-        .eq('couple_id', coupleId)
+        .eq('user_id', user.id)
         .select('*')
         .single()
       if (err) throw err
       setSettings(data)
       return data
     },
-    [coupleId],
+    [user],
   )
 
   return { settings, loading, error, refresh, updateSettings }
