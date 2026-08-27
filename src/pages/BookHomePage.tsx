@@ -10,7 +10,7 @@ import CountdownDisplay from '@/components/book/CountdownDisplay'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 import { useAnniversaries } from '@/hooks/useAnniversaries'
 import { useNow } from '@/hooks/useCountdown'
-import { getCurrentAnniversary, getNextAnniversary, formatThaiDate } from '@/lib/dates'
+import { getCurrentAnniversary, getNextAnniversary, formatThaiDate, parseThaiDateOnly } from '@/lib/dates'
 
 export default function BookHomePage() {
   const { settings, loading: settingsLoading } = useCoupleSettings()
@@ -31,7 +31,7 @@ export default function BookHomePage() {
 
   const currentPage = current
     ? anniversaries.find((a) => a.month_number === current.monthNumber) ??
-      [...anniversaries].reverse().find((a) => new Date(a.anniversary_date) <= now)
+      [...anniversaries].reverse().find((a) => parseThaiDateOnly(a.anniversary_date) <= now)
     : anniversaries[anniversaries.length - 1]
 
   return (

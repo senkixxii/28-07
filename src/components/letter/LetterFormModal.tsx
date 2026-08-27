@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLetters } from '@/hooks/useLetters'
 import { uploadLoveBookImage } from '@/lib/storage'
 import { friendlyError } from '@/lib/supabase'
+import { todayThaiDateString } from '@/lib/dates'
 import type { Letter } from '@/types'
 
 interface LetterFormModalProps {
@@ -33,7 +34,7 @@ export default function LetterFormModal({ open, onClose, letter, onSaved }: Lett
   useEffect(() => {
     if (open) {
       setTitle(letter?.title ?? '')
-      setDate(letter?.letter_date ?? new Date().toISOString().slice(0, 10))
+      setDate(letter?.letter_date ?? todayThaiDateString())
       setMessage(letter?.message ?? '')
       setImageFile(null)
       setImagePreview(letter?.image_url ?? null)

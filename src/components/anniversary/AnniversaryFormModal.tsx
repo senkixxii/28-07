@@ -11,7 +11,7 @@ import { useAnniversaries } from '@/hooks/useAnniversaries'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 import { uploadLoveBookImage, deleteLoveBookImage } from '@/lib/storage'
 import { friendlyError } from '@/lib/supabase'
-import { monthsElapsed } from '@/lib/dates'
+import { monthsElapsed, todayThaiDateString } from '@/lib/dates'
 import type { AnniversaryImage, AnniversaryWithImages, PhotoLayout } from '@/types'
 
 interface AnniversaryFormModalProps {
@@ -42,7 +42,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
   useEffect(() => {
     if (open) {
       setTitle(anniversary?.title ?? '')
-      const initialDate = anniversary?.anniversary_date ?? new Date().toISOString().slice(0, 10)
+      const initialDate = anniversary?.anniversary_date ?? todayThaiDateString()
       setDate(initialDate)
       setMonthNumber(
         anniversary?.month_number ??
