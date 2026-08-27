@@ -45,11 +45,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # Creates/enables the Pages site (build type "workflow") on first run
-      # if it doesn't already exist — deploy-pages alone doesn't do this.
-      # enablement defaults to false, so it must be set explicitly.
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
+      # Requires Pages to already be enabled once, manually, at:
+      # https://github.com/senkixxii/28-07/settings/pages -> Build and
+      # deployment -> Source: GitHub Actions. The default GITHUB_TOKEN
+      # can't create the Pages site itself (needs repo-admin scope), only
+      # deploy to one that already exists.
       - id: deployment
         uses: actions/deploy-pages@v4
