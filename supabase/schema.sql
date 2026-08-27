@@ -127,6 +127,7 @@ create table if not exists public.anniversaries (
   anniversary_date date not null,
   message text,
   cover_image_url text,
+  photo_layout text not null default 'single' check (photo_layout in ('single', 'grid', 'stack')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

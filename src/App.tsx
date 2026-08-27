@@ -11,6 +11,7 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
 import BookHomePage from '@/pages/BookHomePage'
 import AnniversariesPage from '@/pages/AnniversariesPage'
 import AnniversaryDetailPage from '@/pages/AnniversaryDetailPage'
+import MemoryBookPage from '@/pages/MemoryBookPage'
 import LettersPage from '@/pages/LettersPage'
 import PhotosPage from '@/pages/PhotosPage'
 import SettingsPage from '@/pages/SettingsPage'
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/book" element={<ProtectedRoute><BookHomePage /></ProtectedRoute>} />
         <Route path="/anniversaries" element={<ProtectedRoute><AnniversariesPage /></ProtectedRoute>} />
         <Route path="/anniversaries/:id" element={<ProtectedRoute><AnniversaryDetailPage /></ProtectedRoute>} />
+        <Route path="/memory-book" element={<ProtectedRoute><MemoryBookPage /></ProtectedRoute>} />
         <Route path="/letters" element={<ProtectedRoute><LettersPage /></ProtectedRoute>} />
         <Route path="/photos" element={<ProtectedRoute><PhotosPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />

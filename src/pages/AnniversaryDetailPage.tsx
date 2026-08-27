@@ -10,6 +10,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import Lightbox from '@/components/ui/Lightbox'
 import PageLoader from '@/components/bear/PageLoader'
 import AnniversaryFormModal from '@/components/anniversary/AnniversaryFormModal'
+import MemoryPhotoLayout from '@/components/anniversary/MemoryPhotoLayout'
 import { useAnniversary, useAnniversaries } from '@/hooks/useAnniversaries'
 import { useAuth } from '@/contexts/AuthContext'
 import { friendlyError } from '@/lib/supabase'
@@ -88,31 +89,44 @@ export default function AnniversaryDetailPage() {
       >
         {/* Left page */}
         <div className="paper-texture relative flex flex-col items-center justify-center gap-4 border-b border-black/5 p-8 lg:border-b-0 lg:border-r">
-          <div className="aspect-square w-full max-w-xs overflow-hidden rounded-xl2 bg-soft-pink/40 shadow-softer">
-            {cover ? (
-              <button onClick={() => setLightboxIndex(0)} className="block h-full w-full">
-                <img src={cover} alt={anniversary.title} className="h-full w-full object-cover" />
-              </button>
-            ) : (
-              <div className="flex h-full items-center justify-center text-5xl">🐻</div>
-            )}
-          </div>
-          <p className="text-sm text-ink-soft">{formatThaiDate(anniversary.anniversary_date)}</p>
+          {anniversary.photo_layout === 'single' ? (
+            <>
+              <div className="aspect-square w-full max-w-xs overflow-hidden rounded-xl2 bg-soft-pink/40 shadow-softer">
+                {cover ? (
+                  <button onClick={() => setLightboxIndex(0)} className="block h-full w-full">
+                    <img src={cover} alt={anniversary.title} className="h-full w-full object-cover" />
+                  </button>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-5xl">🐻</div>
+                )}
+              </div>
 
-          {extraImages.length > 0 && (
-            <div className="mt-2 flex flex-wrap justify-center gap-4 pt-4">
-              {extraImages.map((img, i) => (
-                <button
-                  key={img.id}
-                  onClick={() => setLightboxIndex(images.findIndex((x) => x.url === img.image_url))}
-                  className="rounded-sm bg-white p-1.5 pb-4 shadow-softer transition-transform hover:scale-105"
-                  style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
-                >
-                  <img src={img.image_url} alt="" className="h-20 w-20 object-cover" />
-                </button>
-              ))}
-            </div>
+              {extraImages.length > 0 && (
+                <div className="mt-2 flex flex-wrap justify-center gap-4 pt-4">
+                  {extraImages.map((img, i) => (
+                    <button
+                      key={img.id}
+                      onClick={() => setLightboxIndex(images.findIndex((x) => x.url === img.image_url))}
+                      className="rounded-sm bg-white p-1.5 pb-4 shadow-softer transition-transform hover:scale-105"
+                      style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
+                    >
+                      <img src={img.image_url} alt="" className="h-20 w-20 object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <MemoryPhotoLayout
+              images={images.map((img) => img.url)}
+              layout={anniversary.photo_layout}
+              alt={anniversary.title}
+              onImageClick={setLightboxIndex}
+              className="w-full max-w-xs"
+            />
           )}
+
+          <p className="text-sm text-ink-soft">{formatThaiDate(anniversary.anniversary_date)}</p>
         </div>
 
         {/* Right page */}

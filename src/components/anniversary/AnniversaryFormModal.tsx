@@ -5,13 +5,14 @@ import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Input'
 import ImageUploader, { type PendingImage } from '@/components/ui/ImageUploader'
+import PhotoLayoutPicker from '@/components/anniversary/PhotoLayoutPicker'
 import { useAuth } from '@/contexts/AuthContext'
 import { useAnniversaries } from '@/hooks/useAnniversaries'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 import { uploadLoveBookImage, deleteLoveBookImage } from '@/lib/storage'
 import { friendlyError } from '@/lib/supabase'
 import { monthsElapsed } from '@/lib/dates'
-import type { AnniversaryImage, AnniversaryWithImages } from '@/types'
+import type { AnniversaryImage, AnniversaryWithImages, PhotoLayout } from '@/types'
 
 interface AnniversaryFormModalProps {
   open: boolean
@@ -34,6 +35,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
   const [existingImages, setExistingImages] = useState<AnniversaryImage[]>([])
   const [pending, setPending] = useState<PendingImage[]>([])
+  const [photoLayout, setPhotoLayout] = useState<PhotoLayout>('single')
   const [saving, setSaving] = useState(false)
   const [dragId, setDragId] = useState<string | null>(null)
 
@@ -50,6 +52,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
       setCoverImageUrl(anniversary?.cover_image_url ?? null)
       setExistingImages(anniversary?.anniversary_images ?? [])
       setPending([])
+      setPhotoLayout(anniversary?.photo_layout ?? 'single')
     }
   }, [open, anniversary, settings])
 
@@ -116,6 +119,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
         anniversary_date: date,
         month_number: monthNumber,
         message: message.trim() || null,
+        photo_layout: photoLayout,
       }
 
       const anniversaryId = isEdit ? anniversary!.id : (await createAnniversary({ ...basePayload, cover_image_url: null })).id
@@ -223,6 +227,13 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
           )}
 
           <ImageUploader pending={pending} onAdd={handleAddFiles} onRemove={handleRemovePending} disabled={saving} />
+
+          {existingImages.length + pending.length >= 2 && (
+            <div className="space-y-1.5 pt-1">
+              <p className="text-sm font-medium text-ink">รูปแบบการแสดงรูป</p>
+              <PhotoLayoutPicker value={photoLayout} onChange={setPhotoLayout} />
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
