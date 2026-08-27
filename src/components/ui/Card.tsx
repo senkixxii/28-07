@@ -5,7 +5,7 @@ export default function Card({ className, ...props }: HTMLAttributes<HTMLDivElem
   return (
     <div
       className={cn(
-        'rounded-xl3 border border-black/5 bg-warm-white/90 p-5 shadow-softer backdrop-blur-sm',
+        'rounded-xl3 border border-black/5 bg-warm-white/90 p-5 shadow-softer backdrop-blur-sm transition-shadow duration-300',
         className,
       )}
       {...props}

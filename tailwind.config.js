@@ -32,6 +32,8 @@ export default {
         softer: '0 2px 12px -2px rgba(74, 63, 69, 0.08)',
         lift: '0 12px 32px -8px rgba(74, 63, 69, 0.18)',
         page: '0 2px 8px rgba(74,63,69,0.06), 0 20px 40px -20px rgba(74,63,69,0.25)',
+        glow: '0 8px 24px -6px rgba(214, 58, 120, 0.35)',
+        'glow-sm': '0 4px 14px -4px rgba(214, 58, 120, 0.3)',
       },
       keyframes: {
         float: {
@@ -47,11 +49,20 @@ export default {
           '10%': { opacity: 1 },
           '100%': { transform: 'translateY(-120px) translateX(10px)', opacity: 0 },
         },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'bg-drift': {
+          '0%, 100%': { transform: 'translate(0, 0)' },
+          '50%': { transform: 'translate(2%, -2%)' },
+        },
       },
       animation: {
         float: 'float 4s ease-in-out infinite',
         'fade-in': 'fade-in 0.4s ease-out both',
         drift: 'drift 5s ease-in infinite',
+        shimmer: 'shimmer 1.6s ease-in-out infinite',
+        'bg-drift': 'bg-drift 18s ease-in-out infinite',
       },
     },
   },

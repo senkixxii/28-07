@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 export default function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded-xl2 bg-black/[0.06]', className)} />
+  return <div className={cn('shimmer-sweep relative overflow-hidden rounded-xl2 bg-black/[0.06]', className)} />
 }
 
 export function CardSkeleton() {

@@ -43,6 +43,11 @@
 
   body {
     @apply bg-cream text-ink font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(248, 187, 208, 0.16), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 100% 20%, rgba(220, 238, 255, 0.22), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 20% 100%, rgba(232, 223, 245, 0.14), transparent 60%);
+    background-attachment: fixed;
   }
 
   :focus-visible {
@@ -61,6 +66,12 @@
   }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @layer utilities {
   .scrollbar-none {
     scrollbar-width: none;
@@ -72,5 +83,21 @@
   .paper-texture {
     background-image: radial-gradient(rgba(74, 63, 69, 0.035) 1px, transparent 1px);
     background-size: 4px 4px;
+  }
+
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer-sweep::after {
+      animation: none;
+      display: none;
+    }
   }
 }

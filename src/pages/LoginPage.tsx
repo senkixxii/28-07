@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Lock } from 'lucide-react'
 import BearMascot from '@/components/bear/BearMascot'
+import FloatingHearts from '@/components/book/FloatingHearts'
 import Button from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/contexts/AuthContext'
@@ -36,12 +37,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-soft-pink via-cream to-baby-blue/40 px-4 py-10">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-soft-pink via-cream to-baby-blue/40 px-4 py-10">
+      <FloatingHearts />
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="w-full max-w-sm rounded-xl3 border border-white/60 bg-warm-white/80 p-8 shadow-lift backdrop-blur-md"
+        className="relative z-10 w-full max-w-sm rounded-xl3 border border-white/60 bg-warm-white/80 p-8 shadow-lift backdrop-blur-md"
       >
         <div className="mb-6 flex flex-col items-center text-center">
           <BearMascot size={72} mood="happy" float />

@@ -39,7 +39,7 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
               <button
                 onClick={onClose}
                 aria-label="ปิด"
-                className="ml-auto rounded-full p-1.5 text-ink-soft hover:bg-black/5"
+                className="ml-auto rounded-full p-1.5 text-ink-soft transition-all hover:rotate-90 hover:bg-black/5 hover:text-ink active:scale-90"
               >
                 <X className="h-5 w-5" />
               </button>

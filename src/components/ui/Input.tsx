@@ -9,7 +9,7 @@ interface FieldWrapperProps {
 }
 
 const fieldBase =
-  'w-full rounded-2xl border border-black/10 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted transition-colors focus:border-pastel-pink'
+  'w-full rounded-2xl border border-black/10 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted transition-all focus:border-pastel-pink focus:shadow-[0_0_0_4px_rgba(248,187,208,0.3)]'
 
 export const Input = forwardRef<
   HTMLInputElement,
