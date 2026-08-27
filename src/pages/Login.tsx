@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock } from 'lucide-react'
-import PigMascot from '@/components/pig/PigMascot'
+import BearMascot from '@/components/bear/BearMascot'
 import Button from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/contexts/AuthContext'
@@ -37,7 +37,7 @@ export default function Login() {
         showToast('ยินดีต้อนรับกลับมานะ 💕', 'success')
       } else if (mode === 'register') {
         await signUp(email, password)
-        setInfo('สมัครสำเร็จแล้ว! เช็คอีเมลเพื่อยืนยันบัญชี แล้วค่อยเข้าสู่ระบบนะ 🐷')
+        setInfo('สมัครสำเร็จแล้ว! เช็คอีเมลเพื่อยืนยันบัญชี แล้วค่อยเข้าสู่ระบบนะ 🐻')
         setMode('login')
       } else {
         await resetPassword(email)
@@ -59,9 +59,9 @@ export default function Login() {
         className="w-full max-w-sm rounded-xl3 border border-white/60 bg-white/80 p-8 shadow-lift backdrop-blur-md"
       >
         <div className="mb-6 flex flex-col items-center text-center">
-          <PigMascot size={72} mood={mode === 'forgot' ? 'sleepy' : 'happy'} float />
+          <BearMascot size={72} mood={mode === 'forgot' ? 'sleepy' : 'happy'} float />
           <h1 className="mt-3 text-xl font-semibold text-ink">Our Little Love Book</h1>
-          <p className="mt-1 text-sm text-ink-soft">สมุดความทรงจำของเรา 🐷💕</p>
+          <p className="mt-1 text-sm text-ink-soft">สมุดความทรงจำของเรา 🐻💕</p>
         </div>
 
         {info && (

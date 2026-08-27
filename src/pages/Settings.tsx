@@ -3,7 +3,7 @@ import AppShell from '@/components/layout/AppShell'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import PageLoader from '@/components/pig/PageLoader'
+import PageLoader from '@/components/bear/PageLoader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 import { useToast } from '@/contexts/ToastContext'
@@ -76,7 +76,7 @@ export default function Settings() {
         theme_preference: theme,
       })
       document.documentElement.dataset.theme = theme
-      showToast('บันทึกการตั้งค่าแล้วนะ 🐷💕', 'success')
+      showToast('บันทึกการตั้งค่าแล้วนะ 🐻💕', 'success')
     } catch (err) {
       showToast(friendlyError(err), 'error')
     } finally {
@@ -191,7 +191,7 @@ function AvatarPicker({
         {url ? (
           <img src={url} alt={label} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-2xl">🐷</div>
+          <div className="flex h-full items-center justify-center text-2xl">🐻</div>
         )}
         {uploading && <div className="absolute inset-0 flex items-center justify-center bg-black/30 text-xs text-white">...</div>}
       </div>

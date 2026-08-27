@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import Sidebar from './Sidebar'
 import BottomNav from './BottomNav'
-import PigMascot from '@/components/pig/PigMascot'
+import BearMascot from '@/components/bear/BearMascot'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 
@@ -20,7 +20,7 @@ export default function AppShell({ title, children }: { title?: string; children
       <div className="flex min-h-screen flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-black/5 bg-white/60 px-4 py-3 backdrop-blur-sm lg:hidden">
           <div className="flex items-center gap-2">
-            <PigMascot size={30} />
+            <BearMascot size={30} />
             <span className="text-sm font-semibold text-ink">Our Little Love Book</span>
           </div>
           <button

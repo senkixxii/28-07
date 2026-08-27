@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import AppShell from '@/components/layout/AppShell'
 import Lightbox from '@/components/ui/Lightbox'
 import { CardSkeletonGrid } from '@/components/ui/Skeleton'
-import EmptyState from '@/components/pig/EmptyState'
+import EmptyState from '@/components/bear/EmptyState'
 import { useMemories } from '@/hooks/useMemories'
 
 export default function Gallery() {
@@ -77,7 +77,7 @@ export default function Gallery() {
           </div>
 
           {filtered.length === 0 ? (
-            <EmptyState title="ไม่พบรูปที่ตรงกับตัวกรองนะ 🐷" />
+            <EmptyState title="ไม่พบรูปที่ตรงกับตัวกรองนะ 🐻" />
           ) : (
             <div className="columns-2 gap-3 sm:columns-3 lg:columns-4 [&>*]:mb-3">
               {filtered.map((img, i) => (

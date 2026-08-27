@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
-import PigMascot from '@/components/pig/PigMascot'
+import BearMascot from '@/components/bear/BearMascot'
 import { NAV_ITEMS } from './navItems'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/utils'
@@ -11,10 +11,10 @@ export default function Sidebar() {
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r border-black/5 bg-white/70 px-4 py-6 backdrop-blur-sm lg:flex">
       <div className="mb-8 flex items-center gap-2 px-2">
-        <PigMascot size={40} />
+        <BearMascot size={40} />
         <div>
           <p className="text-sm font-semibold leading-tight text-ink">Our Little Love Book</p>
-          <p className="text-xs text-ink-soft">สมุดความทรงจำของเรา 🐷💕</p>
+          <p className="text-xs text-ink-soft">สมุดความทรงจำของเรา 🐻💕</p>
         </div>
       </div>
 

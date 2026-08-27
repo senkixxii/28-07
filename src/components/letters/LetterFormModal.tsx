@@ -43,7 +43,7 @@ export default function LetterFormModal({ open, onClose, letter, onSaved }: Lett
     e.preventDefault()
     if (!user) return
     if (!title.trim() || !message.trim()) {
-      showToast('ใส่หัวข้อและข้อความก่อนนะ 🐷', 'error')
+      showToast('ใส่หัวข้อและข้อความก่อนนะ 🐻', 'error')
       return
     }
 

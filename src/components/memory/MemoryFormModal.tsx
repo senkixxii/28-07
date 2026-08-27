@@ -80,7 +80,7 @@ export default function MemoryFormModal({ open, onClose, memory, onSaved }: Memo
     e.preventDefault()
     if (!user) return
     if (!title.trim()) {
-      showToast('ใส่ชื่อความทรงจำก่อนนะ 🐷', 'error')
+      showToast('ใส่ชื่อความทรงจำก่อนนะ 🐻', 'error')
       return
     }
 
@@ -134,7 +134,7 @@ export default function MemoryFormModal({ open, onClose, memory, onSaved }: Memo
 
       await updateMemory(memoryId, { ...basePayload, cover_image_url: newCover })
 
-      showToast(isEdit ? 'บันทึกความทรงจำแล้วนะ 💕' : 'เพิ่มความทรงจำใหม่แล้ว! 🐷', 'success')
+      showToast(isEdit ? 'บันทึกความทรงจำแล้วนะ 💕' : 'เพิ่มความทรงจำใหม่แล้ว! 🐻', 'success')
       onSaved()
       onClose()
     } catch (err) {

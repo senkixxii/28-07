@@ -5,9 +5,9 @@ import { BookHeart, Calendar, Camera, Heart, Sparkles } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import PigMascot from '@/components/pig/PigMascot'
-import PageLoader from '@/components/pig/PageLoader'
-import EmptyState from '@/components/pig/EmptyState'
+import BearMascot from '@/components/bear/BearMascot'
+import PageLoader from '@/components/bear/PageLoader'
+import EmptyState from '@/components/bear/EmptyState'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
 import { useMemories } from '@/hooks/useMemories'
 import { useAnniversaries } from '@/hooks/useAnniversaries'
@@ -70,7 +70,7 @@ export default function Dashboard() {
               </div>
             )}
           </div>
-          <PigMascot size={120} mood="happy" float />
+          <BearMascot size={120} mood="happy" float />
         </div>
       </Card>
 
@@ -139,7 +139,7 @@ export default function Dashboard() {
             </motion.div>
           ) : (
             <EmptyState
-              title="🐷 วันนี้มีความทรงจำใหม่หรือยัง?"
+              title="🐻 วันนี้มีความทรงจำใหม่หรือยัง?"
               description="มาเพิ่มเรื่องราวของเรากันเถอะ"
               action={
                 <Link to="/memories">

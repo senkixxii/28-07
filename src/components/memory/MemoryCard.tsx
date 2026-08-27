@@ -25,11 +25,11 @@ export default function MemoryCard({ memory, index = 0 }: { memory: MemoryWithIm
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-4xl">🐷</div>
+            <div className="flex h-full items-center justify-center text-4xl">🐻</div>
           )}
         </div>
         <div className="p-4">
-          <p className="text-xs text-ink-soft">🐷 {formatThaiDate(memory.memory_date)}</p>
+          <p className="text-xs text-ink-soft">🐻 {formatThaiDate(memory.memory_date)}</p>
           <h3 className="mt-1 font-semibold text-ink">{memory.title}</h3>
           {memory.description && (
             <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{memory.description}</p>

@@ -56,7 +56,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
     e.preventDefault()
     if (!user) return
     if (!title.trim() || !date) {
-      showToast('ใส่ชื่อและวันที่ก่อนนะ 🐷', 'error')
+      showToast('ใส่ชื่อและวันที่ก่อนนะ 🐻', 'error')
       return
     }
 
@@ -88,7 +88,7 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
         await updateAnniversary(saved.id, { cover_image_url: uploaded.imageUrl })
       }
 
-      showToast(isEdit ? 'บันทึกการแก้ไขแล้วนะ 💕' : 'เพิ่มวันครบรอบใหม่แล้ว! 🐷', 'success')
+      showToast(isEdit ? 'บันทึกการแก้ไขแล้วนะ 💕' : 'เพิ่มวันครบรอบใหม่แล้ว! 🐻', 'success')
       onSaved()
       onClose()
     } catch (err) {

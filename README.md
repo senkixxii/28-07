@@ -1,4 +1,4 @@
-# Our Little Love Book 🐷💕
+# Our Little Love Book 🐻💕
 
 สมุดความทรงจำของเรา — a private, production-ready couple memory book: memories, anniversaries, a timeline, love letters, and a photo gallery, backed by real Supabase auth, database, and storage.
 
@@ -64,7 +64,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-public-key
 
 ```text
 src/
-├── components/   ui/, layout/, memory/, anniversary/, gallery/, letters/, pig/
+├── components/   ui/, layout/, memory/, anniversary/, gallery/, letters/, bear/
 ├── pages/        one file per route
 ├── hooks/        Supabase data hooks (memories, anniversaries, letters, settings)
 ├── lib/          supabase client, storage helpers, date/format utils

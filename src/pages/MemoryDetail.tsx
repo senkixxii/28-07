@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Lightbox from '@/components/ui/Lightbox'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import PageLoader from '@/components/pig/PageLoader'
+import PageLoader from '@/components/bear/PageLoader'
 import MemoryFormModal from '@/components/memory/MemoryFormModal'
 import { useMemory, useMemories } from '@/hooks/useMemories'
 import { useToast } from '@/contexts/ToastContext'
@@ -40,7 +40,7 @@ export default function MemoryDetail() {
     return (
       <AppShell>
         <Card className="text-center">
-          <p className="text-ink-soft">ไม่พบความทรงจำนี้นะ 🐷</p>
+          <p className="text-ink-soft">ไม่พบความทรงจำนี้นะ 🐻</p>
           <Link to="/memories">
             <Button variant="ghost" className="mt-4">
               กลับไปหน้าความทรงจำ
@@ -78,7 +78,7 @@ export default function MemoryDetail() {
       <Card className="mb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm text-ink-soft">🐷 {formatThaiDate(memory.memory_date)}</p>
+            <p className="text-sm text-ink-soft">🐻 {formatThaiDate(memory.memory_date)}</p>
             <h1 className="mt-1 text-2xl font-semibold text-ink">{memory.title}</h1>
             {memory.location && (
               <p className="mt-1 inline-flex items-center gap-1 text-sm text-ink-soft">

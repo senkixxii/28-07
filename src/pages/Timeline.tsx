@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Heart } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
-import PageLoader from '@/components/pig/PageLoader'
-import EmptyState from '@/components/pig/EmptyState'
+import PageLoader from '@/components/bear/PageLoader'
+import EmptyState from '@/components/bear/EmptyState'
 import { useMemories } from '@/hooks/useMemories'
 import { useAnniversaries } from '@/hooks/useAnniversaries'
 import { useCoupleSettings } from '@/hooks/useCoupleSettings'
@@ -71,7 +71,7 @@ export default function Timeline() {
   return (
     <AppShell title="🕰️ Timeline">
       {entries.length === 0 ? (
-        <EmptyState title="เส้นเวลาของเรายังว่างอยู่" description="เริ่มบันทึกความทรงจำแรกกันเถอะ 🐷" />
+        <EmptyState title="เส้นเวลาของเรายังว่างอยู่" description="เริ่มบันทึกความทรงจำแรกกันเถอะ 🐻" />
       ) : (
         <div className="relative mx-auto max-w-2xl">
           <div className="absolute bottom-0 left-4 top-0 w-0.5 bg-pastel-pink/40 sm:left-1/2 sm:-translate-x-1/2" />

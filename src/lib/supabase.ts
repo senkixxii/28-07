@@ -23,7 +23,7 @@ export function friendlyError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error)
 
   if (/invalid login credentials/i.test(message)) {
-    return 'อีเมลหรือรหัสผ่านไม่ถูกต้องนะ ลองใหม่อีกครั้ง 🐷'
+    return 'อีเมลหรือรหัสผ่านไม่ถูกต้องนะ ลองใหม่อีกครั้ง 🐻'
   }
   if (/already registered|user already exists/i.test(message)) {
     return 'อีเมลนี้มีบัญชีอยู่แล้วนะ ลองเข้าสู่ระบบดูสิ 💕'
@@ -35,11 +35,11 @@ export function friendlyError(error: unknown): string {
     return 'รหัสผ่านสั้นไปนิดนึง ต้องมีอย่างน้อย 6 ตัวอักษรนะ'
   }
   if (/duplicate key/i.test(message)) {
-    return 'ข้อมูลนี้มีอยู่แล้วนะ 🐷'
+    return 'ข้อมูลนี้มีอยู่แล้วนะ 🐻'
   }
   if (/network/i.test(message)) {
     return 'เชื่อมต่ออินเทอร์เน็ตไม่ได้ ลองเช็คสัญญาณดูนะ 📶'
   }
 
-  return 'เกิดข้อผิดพลาดเล็กน้อย ลองใหม่อีกครั้งนะ 🐷'
+  return 'เกิดข้อผิดพลาดเล็กน้อย ลองใหม่อีกครั้งนะ 🐻'
 }
