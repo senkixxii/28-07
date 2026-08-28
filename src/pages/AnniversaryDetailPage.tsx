@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import ImagePreviewDialog from '@/components/ui/ImagePreviewDialog'
+import ShareCustomizeDialog from '@/components/ui/ShareCustomizeDialog'
 import Lightbox from '@/components/ui/Lightbox'
 import PageLoader from '@/components/bear/PageLoader'
 import AnniversaryFormModal from '@/components/anniversary/AnniversaryFormModal'
@@ -18,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { friendlyError } from '@/lib/supabase'
 import { deleteLoveBookFolder } from '@/lib/storage'
 import { captureNodeImage } from '@/lib/shareImage'
+import { DEFAULT_FOCAL_POINT, type FocalPoint, type ShareAspectRatio } from '@/lib/shareCardLayout'
 import { formatThaiDate } from '@/lib/dates'
 
 const ROTATIONS = [-4, 3, -2, 4, -3, 2]
@@ -37,6 +39,10 @@ export default function AnniversaryDetailPage() {
   const [capturing, setCapturing] = useState(false)
   const [previewBlob, setPreviewBlob] = useState<Blob | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [customizeOpen, setCustomizeOpen] = useState(false)
+  const [aspectRatio, setAspectRatio] = useState<ShareAspectRatio>('story')
+  const [heroUrl, setHeroUrl] = useState<string | null>(null)
+  const [focalPoint, setFocalPoint] = useState<FocalPoint>(DEFAULT_FOCAL_POINT)
 
   if (loading) {
     return (
@@ -77,22 +83,34 @@ export default function AnniversaryDetailPage() {
     }
   }
 
-  async function handlePreviewShare() {
-    if (!anniversary || !shareCardRef.current) return
+  const cover = anniversary.cover_image_url ?? anniversary.anniversary_images[0]?.image_url ?? null
+  const extraImages = anniversary.anniversary_images.filter((img) => img.image_url !== cover)
+  const images = anniversary.anniversary_images.map((img) => ({ url: img.image_url, alt: anniversary.title }))
+  const photoOptions = anniversary.anniversary_images.map((img) => img.image_url)
+
+  function handleOpenCustomize() {
+    setHeroUrl((current) => current ?? cover)
+    setCustomizeOpen(true)
+  }
+
+  function handleSelectHero(url: string) {
+    setHeroUrl(url)
+    setFocalPoint(DEFAULT_FOCAL_POINT)
+  }
+
+  async function handleConfirmCustomize() {
+    if (!shareCardRef.current) return
     setCapturing(true)
     try {
       const blob = await captureNodeImage(shareCardRef.current)
       setPreviewBlob(blob)
+      setCustomizeOpen(false)
     } catch (err) {
       toast.error(friendlyError(err))
     } finally {
       setCapturing(false)
     }
   }
-
-  const cover = anniversary.cover_image_url ?? anniversary.anniversary_images[0]?.image_url ?? null
-  const extraImages = anniversary.anniversary_images.filter((img) => img.image_url !== cover)
-  const images = anniversary.anniversary_images.map((img) => ({ url: img.image_url, alt: anniversary.title }))
 
   return (
     <AppShell>
@@ -162,8 +180,8 @@ export default function AnniversaryDetailPage() {
         <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
           <Pencil className="h-3.5 w-3.5" /> แก้ไข
         </Button>
-        <Button variant="ghost" size="sm" onClick={handlePreviewShare} loading={capturing}>
-          {!capturing && <Share2 className="h-3.5 w-3.5" />} แชร์รูปภาพ
+        <Button variant="ghost" size="sm" onClick={handleOpenCustomize}>
+          <Share2 className="h-3.5 w-3.5" /> แชร์รูปภาพ
         </Button>
         <Button variant="danger" size="sm" onClick={() => setConfirmOpen(true)}>
           <Trash2 className="h-3.5 w-3.5" /> ลบ
@@ -176,8 +194,25 @@ export default function AnniversaryDetailPage() {
           image — keeps the export a consistent shape regardless of how the
           responsive page above happens to stack on the viewer's screen. */}
       <div style={{ position: 'fixed', top: 0, left: -99999 }} aria-hidden="true">
-        <AnniversaryShareCard ref={shareCardRef} anniversary={anniversary} />
+        <AnniversaryShareCard ref={shareCardRef} anniversary={anniversary} aspectRatio={aspectRatio} heroUrl={heroUrl} focalPoint={focalPoint} />
       </div>
+
+      <ShareCustomizeDialog
+        open={customizeOpen}
+        onClose={() => setCustomizeOpen(false)}
+        onConfirm={handleConfirmCustomize}
+        capturing={capturing}
+        aspectRatio={aspectRatio}
+        onAspectRatioChange={setAspectRatio}
+        hasPhoto={Boolean(heroUrl)}
+        focalPoint={focalPoint}
+        onFocalPointChange={setFocalPoint}
+        photoOptions={photoOptions}
+        selectedPhoto={heroUrl}
+        onSelectPhoto={handleSelectHero}
+      >
+        <AnniversaryShareCard anniversary={anniversary} aspectRatio={aspectRatio} heroUrl={heroUrl} focalPoint={focalPoint} />
+      </ShareCustomizeDialog>
 
       <ImagePreviewDialog
         blob={previewBlob}

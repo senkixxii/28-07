@@ -5,9 +5,11 @@ import { toast } from 'sonner'
 import { Pencil, Share2, Trash2, X } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import ImagePreviewDialog from '@/components/ui/ImagePreviewDialog'
+import ShareCustomizeDialog from '@/components/ui/ShareCustomizeDialog'
 import LetterShareCard from '@/components/letter/LetterShareCard'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { captureNodeImage } from '@/lib/shareImage'
+import { DEFAULT_FOCAL_POINT, type FocalPoint, type ShareAspectRatio } from '@/lib/shareCardLayout'
 import { friendlyError } from '@/lib/supabase'
 import { formatThaiDate } from '@/lib/dates'
 import type { Letter } from '@/types'
@@ -30,6 +32,9 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
   const [previewBlob, setPreviewBlob] = useState<Blob | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const shareCardRef = useRef<HTMLDivElement>(null)
+  const [customizeOpen, setCustomizeOpen] = useState(false)
+  const [aspectRatio, setAspectRatio] = useState<ShareAspectRatio>('story')
+  const [focalPoint, setFocalPoint] = useState<FocalPoint>(DEFAULT_FOCAL_POINT)
 
   const lines = letter?.message.split('\n') ?? []
 
@@ -38,12 +43,13 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
     onClose()
   }
 
-  async function handlePreviewShare() {
-    if (!letter || !shareCardRef.current) return
+  async function handleConfirmCustomize() {
+    if (!shareCardRef.current) return
     setCapturing(true)
     try {
       const blob = await captureNodeImage(shareCardRef.current)
       setPreviewBlob(blob)
+      setCustomizeOpen(false)
     } catch (err) {
       toast.error(friendlyError(err))
     } finally {
@@ -135,8 +141,8 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
                     <Button variant="secondary" size="sm" onClick={onEdit}>
                       <Pencil className="h-3.5 w-3.5" /> แก้ไข
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={handlePreviewShare} loading={capturing}>
-                      {!capturing && <Share2 className="h-3.5 w-3.5" />} แชร์
+                    <Button variant="ghost" size="sm" onClick={() => setCustomizeOpen(true)}>
+                      <Share2 className="h-3.5 w-3.5" /> แชร์
                     </Button>
                     <Button variant="danger" size="sm" onClick={onDelete}>
                       <Trash2 className="h-3.5 w-3.5" /> ลบ
@@ -155,8 +161,22 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
           {/* Off-screen, fixed-size layout used only to generate the
               shareable image — see AnniversaryShareCard for why. */}
           <div style={{ position: 'fixed', top: 0, left: -99999 }} aria-hidden="true">
-            <LetterShareCard ref={shareCardRef} letter={letter} />
+            <LetterShareCard ref={shareCardRef} letter={letter} aspectRatio={aspectRatio} focalPoint={focalPoint} />
           </div>
+
+          <ShareCustomizeDialog
+            open={customizeOpen}
+            onClose={() => setCustomizeOpen(false)}
+            onConfirm={handleConfirmCustomize}
+            capturing={capturing}
+            aspectRatio={aspectRatio}
+            onAspectRatioChange={setAspectRatio}
+            hasPhoto={Boolean(letter.image_url)}
+            focalPoint={focalPoint}
+            onFocalPointChange={setFocalPoint}
+          >
+            <LetterShareCard letter={letter} aspectRatio={aspectRatio} focalPoint={focalPoint} />
+          </ShareCustomizeDialog>
 
           <ImagePreviewDialog
             blob={previewBlob}

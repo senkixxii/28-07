@@ -1,39 +1,42 @@
 import { forwardRef } from 'react'
 import { formatThaiDate } from '@/lib/dates'
+import { SHARE_ASPECT_RATIOS, type FocalPoint, type ShareAspectRatio } from '@/lib/shareCardLayout'
 import type { AnniversaryWithImages } from '@/types'
 
 interface AnniversaryShareCardProps {
   anniversary: AnniversaryWithImages
+  aspectRatio: ShareAspectRatio
+  heroUrl: string | null
+  focalPoint: FocalPoint
 }
 
 /**
  * A fixed-size layout used only for generating the shareable image — kept
- * separate from the on-screen page so the export always comes out with the
- * same well-proportioned shape, regardless of how tall the on-screen
- * responsive layout happens to stack on a phone (which is what made shares
- * look cropped/stretched once dropped into an Instagram Story).
+ * separate from the on-screen page so the export always comes out with a
+ * consistent, deliberately-chosen shape instead of however tall the
+ * responsive on-screen layout happens to stack on the viewer's phone.
+ * aspectRatio/heroUrl/focalPoint are user-adjustable via ShareCustomizeDialog.
  */
 const AnniversaryShareCard = forwardRef<HTMLDivElement, AnniversaryShareCardProps>(function AnniversaryShareCard(
-  { anniversary },
+  { anniversary, aspectRatio, heroUrl, focalPoint },
   ref,
 ) {
-  const cover = anniversary.cover_image_url ?? anniversary.anniversary_images[0]?.image_url ?? null
-  const gallery = anniversary.anniversary_images.map((img) => img.image_url)
-  const collage = gallery.length > 1 ? gallery.slice(0, 4) : []
+  const { width, height, photoHeight, messageLines } = SHARE_ASPECT_RATIOS[aspectRatio]
 
   return (
-    <div ref={ref} style={{ width: 1080, fontFamily: "'Prompt', sans-serif" }} className="flex flex-col bg-warm-white">
-      <div style={{ height: 1080 }} className="relative w-full shrink-0 overflow-hidden bg-soft-pink/40">
-        {collage.length > 0 ? (
-          <div className="grid h-full w-full grid-cols-2 gap-1">
-            {collage.map((url, i) => (
-              <div key={url + i} className="overflow-hidden bg-black/5">
-                <img src={url} alt="" className="h-full w-full object-cover" />
-              </div>
-            ))}
-          </div>
-        ) : cover ? (
-          <img src={cover} alt={anniversary.title} className="h-full w-full object-cover" />
+    <div
+      ref={ref}
+      style={{ width, height, fontFamily: "'Prompt', sans-serif" }}
+      className="flex flex-col overflow-hidden bg-warm-white"
+    >
+      <div style={{ height: photoHeight }} className="relative w-full shrink-0 overflow-hidden bg-soft-pink/40">
+        {heroUrl ? (
+          <img
+            src={heroUrl}
+            alt={anniversary.title}
+            className="h-full w-full object-cover"
+            style={{ objectPosition: `${focalPoint.x}% ${focalPoint.y}%` }}
+          />
         ) : (
           <div style={{ fontSize: 140 }} className="flex h-full items-center justify-center">
             🐻
@@ -41,7 +44,7 @@ const AnniversaryShareCard = forwardRef<HTMLDivElement, AnniversaryShareCardProp
         )}
       </div>
 
-      <div style={{ padding: 64 }} className="flex flex-col">
+      <div style={{ padding: 64 }} className="flex flex-1 flex-col overflow-hidden">
         <p style={{ fontSize: 26 }} className="font-medium text-ink-muted">
           {String(anniversary.month_number).padStart(2, '0')}
         </p>
@@ -70,7 +73,7 @@ const AnniversaryShareCard = forwardRef<HTMLDivElement, AnniversaryShareCardProp
               lineHeight: 1.55,
               marginTop: 28,
               display: '-webkit-box',
-              WebkitLineClamp: 9,
+              WebkitLineClamp: messageLines,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
             }}
@@ -80,7 +83,7 @@ const AnniversaryShareCard = forwardRef<HTMLDivElement, AnniversaryShareCardProp
           </p>
         )}
 
-        <p style={{ fontSize: 22, marginTop: 40 }} className="text-ink-muted">
+        <p style={{ fontSize: 22, marginTop: 'auto', paddingTop: 24 }} className="text-ink-muted">
           🐻 สมุดเล็กๆของเราสองคน
         </p>
       </div>
