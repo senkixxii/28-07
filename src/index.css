@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Prompt';
+  src: url('./assets/fonts/Prompt-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Prompt';
+  src: url('./assets/fonts/Prompt-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Prompt';
+  src: url('./assets/fonts/Prompt-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Prompt';
+  src: url('./assets/fonts/Prompt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --accent-bg: #f8bbd0;
+    --accent-bg-strong: #f5aac5;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(248, 187, 208, 0.16), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 100% 20%, rgba(220, 238, 255, 0.22), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 20% 100%, rgba(232, 223, 245, 0.14), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-pastel-pink ring-offset-2 ring-offset-cream rounded-md;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .paper-texture {
+    background-image: radial-gradient(rgba(74, 63, 69, 0.035) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer-sweep::after {
+      animation: none;
+      display: none;
+    }
+  }
+}

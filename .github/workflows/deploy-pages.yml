@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - claude/scrapbook-animations-interactions-mi2c5v
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          # Supabase's anon/publishable key is safe to expose client-side —
+          # it's baked into the bundle either way, and RLS is the real
+          # security boundary (see supabase/schema.sql).
+          VITE_SUPABASE_URL: https://lirzinbdfcbldzduzrya.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_7UlvCkKZ3uP42VpPyLHwBA_xu2SUTLr
+      - run: cp dist/index.html dist/404.html
+      - run: touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Requires Pages to already be enabled once, manually, at:
+      # https://github.com/senkixxii/28-07/settings/pages -> Build and
+      # deployment -> Source: GitHub Actions. The default GITHUB_TOKEN
+      # can't create the Pages site itself (needs repo-admin scope), only
+      # deploy to one that already exists.
+      - id: deployment
+        uses: actions/deploy-pages@v4
