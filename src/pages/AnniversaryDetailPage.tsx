@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
+import { ArrowLeft, Pencil, Share2, Trash2 } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -15,6 +15,7 @@ import { useAnniversary, useAnniversaries } from '@/hooks/useAnniversaries'
 import { useAuth } from '@/contexts/AuthContext'
 import { friendlyError } from '@/lib/supabase'
 import { deleteLoveBookFolder } from '@/lib/storage'
+import { captureAndShareImage } from '@/lib/shareImage'
 import { formatThaiDate } from '@/lib/dates'
 
 const ROTATIONS = [-4, 3, -2, 4, -3, 2]
@@ -25,10 +26,12 @@ export default function AnniversaryDetailPage() {
   const { anniversary, loading, refresh } = useAnniversary(id)
   const { deleteAnniversary } = useAnniversaries()
   const navigate = useNavigate()
+  const pageRef = useRef<HTMLDivElement>(null)
 
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [sharing, setSharing] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   if (loading) {
@@ -70,6 +73,25 @@ export default function AnniversaryDetailPage() {
     }
   }
 
+  async function handleShare() {
+    if (!anniversary || !pageRef.current) return
+    setSharing(true)
+    try {
+      await captureAndShareImage(pageRef.current, {
+        // Some browsers mangle non-ASCII filenames on blob downloads, so keep
+        // this part plain — the Thai title/text below still show up in the
+        // native share sheet where Unicode works fine.
+        filename: `love-book-anniversary-${anniversary.month_number}.png`,
+        title: anniversary.title,
+        text: `${anniversary.title} · ${formatThaiDate(anniversary.anniversary_date)}`,
+      })
+    } catch (err) {
+      toast.error(friendlyError(err))
+    } finally {
+      setSharing(false)
+    }
+  }
+
   const cover = anniversary.cover_image_url ?? anniversary.anniversary_images[0]?.image_url ?? null
   const extraImages = anniversary.anniversary_images.filter((img) => img.image_url !== cover)
   const images = anniversary.anniversary_images.map((img) => ({ url: img.image_url, alt: anniversary.title }))
@@ -81,6 +103,7 @@ export default function AnniversaryDetailPage() {
       </Link>
 
       <motion.div
+        ref={pageRef}
         initial={{ opacity: 0, rotateY: -6 }}
         animate={{ opacity: 1, rotateY: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -134,17 +157,20 @@ export default function AnniversaryDetailPage() {
           <p className="text-xs font-medium text-ink-muted">{String(anniversary.month_number).padStart(2, '0')}</p>
           <h1 className="mt-1 text-2xl font-semibold text-ink">{anniversary.title}</h1>
           {anniversary.message && <p className="mt-4 whitespace-pre-line leading-relaxed text-ink">{anniversary.message}</p>}
-
-          <div className="mt-6 flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-              <Pencil className="h-3.5 w-3.5" /> แก้ไข
-            </Button>
-            <Button variant="danger" size="sm" onClick={() => setConfirmOpen(true)}>
-              <Trash2 className="h-3.5 w-3.5" /> ลบ
-            </Button>
-          </div>
         </div>
       </motion.div>
+
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
+          <Pencil className="h-3.5 w-3.5" /> แก้ไข
+        </Button>
+        <Button variant="ghost" size="sm" onClick={handleShare} loading={sharing}>
+          {!sharing && <Share2 className="h-3.5 w-3.5" />} แชร์เป็นรูปภาพ
+        </Button>
+        <Button variant="danger" size="sm" onClick={() => setConfirmOpen(true)}>
+          <Trash2 className="h-3.5 w-3.5" /> ลบ
+        </Button>
+      </div>
 
       <Lightbox images={images} index={lightboxIndex} onClose={() => setLightboxIndex(null)} onNavigate={setLightboxIndex} />
 
