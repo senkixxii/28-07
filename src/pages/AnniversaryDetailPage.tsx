@@ -86,19 +86,29 @@ export default function AnniversaryDetailPage() {
   }
 
   const cover = anniversary.cover_image_url ?? anniversary.anniversary_images[0]?.image_url ?? null
+  const coverImage = anniversary.anniversary_images.find((img) => img.image_url === cover) ?? null
   const extraImages = anniversary.anniversary_images.filter((img) => img.image_url !== cover)
   const images = anniversary.anniversary_images.map((img) => ({ url: img.image_url, alt: anniversary.title }))
   const photoOptions = anniversary.anniversary_images.map((img) => img.image_url)
 
+  function focalPointFor(url: string | null): FocalPoint {
+    const match = anniversary?.anniversary_images.find((img) => img.image_url === url)
+    return match ? { x: match.focal_x, y: match.focal_y } : DEFAULT_FOCAL_POINT
+  }
+
   function handleOpenCustomize() {
-    setHeroUrl((current) => current ?? cover)
+    setHeroUrl((current) => {
+      const next = current ?? cover
+      if (!current) setFocalPoint(focalPointFor(next))
+      return next
+    })
     setSelectedPhotos((current) => (current.length > 0 ? current : photoOptions.slice(0, 4)))
     setCustomizeOpen(true)
   }
 
   function handleSelectHero(url: string) {
     setHeroUrl(url)
-    setFocalPoint(DEFAULT_FOCAL_POINT)
+    setFocalPoint(focalPointFor(url))
   }
 
   function handleTogglePhoto(url: string) {
@@ -142,7 +152,12 @@ export default function AnniversaryDetailPage() {
               <div className="aspect-square w-full max-w-xs overflow-hidden rounded-xl2 bg-soft-pink/40 shadow-softer">
                 {cover ? (
                   <button onClick={() => setLightboxIndex(0)} className="block h-full w-full">
-                    <img src={cover} alt={anniversary.title} className="h-full w-full object-cover" />
+                    <img
+                      src={cover}
+                      alt={anniversary.title}
+                      className="h-full w-full object-cover"
+                      style={{ objectPosition: `${coverImage?.focal_x ?? 50}% ${coverImage?.focal_y ?? 50}%` }}
+                    />
                   </button>
                 ) : (
                   <div className="flex h-full items-center justify-center text-5xl">🐻</div>
@@ -158,7 +173,12 @@ export default function AnniversaryDetailPage() {
                       className="rounded-sm bg-white p-1.5 pb-4 shadow-softer transition-transform hover:scale-105"
                       style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
                     >
-                      <img src={img.image_url} alt="" className="h-20 w-20 object-cover" />
+                      <img
+                        src={img.image_url}
+                        alt=""
+                        className="h-20 w-20 object-cover"
+                        style={{ objectPosition: `${img.focal_x}% ${img.focal_y}%` }}
+                      />
                     </button>
                   ))}
                 </div>
@@ -166,7 +186,7 @@ export default function AnniversaryDetailPage() {
             </>
           ) : (
             <MemoryPhotoLayout
-              images={images.map((img) => img.url)}
+              images={anniversary.anniversary_images.map((img) => ({ url: img.image_url, focalX: img.focal_x, focalY: img.focal_y }))}
               layout={anniversary.photo_layout}
               alt={anniversary.title}
               onImageClick={setLightboxIndex}

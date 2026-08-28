@@ -120,7 +120,14 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
                     <p className="text-xs text-ink-soft">{formatThaiDate(letter.letter_date)}</p>
                     <h2 className="mt-1 text-xl font-semibold text-ink">{letter.title}</h2>
 
-                    {letter.image_url && <img src={letter.image_url} alt="" className="my-4 w-full rounded-xl2 object-cover" />}
+                    {letter.image_url && (
+                      <img
+                        src={letter.image_url}
+                        alt=""
+                        className="my-4 h-56 w-full rounded-xl2 object-cover"
+                        style={{ objectPosition: `${letter.image_focal_x}% ${letter.image_focal_y}%` }}
+                      />
+                    )}
 
                     <div className="mt-4 space-y-2 leading-relaxed text-ink">
                       {lines.map((line, i) => (
@@ -141,7 +148,14 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
                     <Button variant="secondary" size="sm" onClick={onEdit}>
                       <Pencil className="h-3.5 w-3.5" /> แก้ไข
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setCustomizeOpen(true)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setFocalPoint({ x: letter.image_focal_x, y: letter.image_focal_y })
+                        setCustomizeOpen(true)
+                      }}
+                    >
                       <Share2 className="h-3.5 w-3.5" /> แชร์
                     </Button>
                     <Button variant="danger" size="sm" onClick={onDelete}>

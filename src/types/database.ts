@@ -61,6 +61,8 @@ export type Database = {
         Row: {
           anniversary_id: string
           created_at: string
+          focal_x: number
+          focal_y: number
           id: string
           image_url: string
           sort_order: number
@@ -70,6 +72,8 @@ export type Database = {
         Insert: {
           anniversary_id: string
           created_at?: string
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_url: string
           sort_order?: number
@@ -79,6 +83,8 @@ export type Database = {
         Update: {
           anniversary_id?: string
           created_at?: string
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_url?: string
           sort_order?: number
@@ -138,6 +144,8 @@ export type Database = {
         Row: {
           caption: string | null
           created_at: string
+          focal_x: number
+          focal_y: number
           id: string
           image_url: string
           storage_path: string
@@ -146,6 +154,8 @@ export type Database = {
         Insert: {
           caption?: string | null
           created_at?: string
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_url: string
           storage_path: string
@@ -154,6 +164,8 @@ export type Database = {
         Update: {
           caption?: string | null
           created_at?: string
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_url?: string
           storage_path?: string
@@ -165,6 +177,8 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          image_focal_x: number
+          image_focal_y: number
           image_url: string | null
           letter_date: string
           message: string
@@ -175,6 +189,8 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          image_focal_x?: number
+          image_focal_y?: number
           image_url?: string | null
           letter_date?: string
           message: string
@@ -185,6 +201,8 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          image_focal_x?: number
+          image_focal_y?: number
           image_url?: string | null
           letter_date?: string
           message?: string

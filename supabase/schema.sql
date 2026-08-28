@@ -160,6 +160,8 @@ create table if not exists public.anniversary_images (
   image_url text not null,
   storage_path text not null,
   sort_order int not null default 0,
+  focal_x real not null default 50 check (focal_x >= 0 and focal_x <= 100),
+  focal_y real not null default 50 check (focal_y >= 0 and focal_y <= 100),
   created_at timestamptz not null default now()
 );
 
@@ -199,6 +201,8 @@ create table if not exists public.letters (
   message text not null,
   letter_date date not null default current_date,
   image_url text,
+  image_focal_x real not null default 50 check (image_focal_x >= 0 and image_focal_x <= 100),
+  image_focal_y real not null default 50 check (image_focal_y >= 0 and image_focal_y <= 100),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -230,6 +234,8 @@ create table if not exists public.gallery_images (
   image_url text not null,
   storage_path text not null,
   caption text,
+  focal_x real not null default 50 check (focal_x >= 0 and focal_x <= 100),
+  focal_y real not null default 50 check (focal_y >= 0 and focal_y <= 100),
   created_at timestamptz not null default now()
 );
 

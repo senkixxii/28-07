@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import Lightbox from '@/components/ui/Lightbox'
+import FocalPointPicker from '@/components/ui/FocalPointPicker'
 import ImageUploader, { type PendingImage } from '@/components/ui/ImageUploader'
 import { CardSkeletonGrid } from '@/components/ui/Skeleton'
 import EmptyState from '@/components/bear/EmptyState'
@@ -21,7 +22,7 @@ import type { GalleryImage } from '@/types'
 
 export default function PhotosPage() {
   const { user } = useAuth()
-  const { images, loading, refresh, addImage, deleteImage } = useGalleryImages()
+  const { images, loading, refresh, addImage, deleteImage, updateImage } = useGalleryImages()
   const { show: celebrating, celebrate } = useCelebration()
 
   const [uploadOpen, setUploadOpen] = useState(false)
@@ -30,6 +31,8 @@ export default function PhotosPage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<GalleryImage | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [focalTarget, setFocalTarget] = useState<GalleryImage | null>(null)
+  const [savingFocal, setSavingFocal] = useState(false)
 
   function handleAddFiles(files: File[]) {
     setPending((prev) => [
@@ -51,7 +54,7 @@ export default function PhotosPage() {
         setPending((prev) => prev.map((p) => (p.id === img.id ? { ...p, status: 'uploading' } : p)))
         try {
           const uploaded = await uploadLoveBookImage(user.id, 'gallery', img.file)
-          await addImage({ image_url: uploaded.imageUrl, storage_path: uploaded.storagePath, caption: null })
+          await addImage({ image_url: uploaded.imageUrl, storage_path: uploaded.storagePath, caption: null, focal_x: 50, focal_y: 50 })
         } catch (err) {
           toast.error(friendlyError(err))
         }
@@ -82,6 +85,20 @@ export default function PhotosPage() {
     }
   }
 
+  async function handleSaveFocalPoint(point: { x: number; y: number }) {
+    if (!focalTarget) return
+    setSavingFocal(true)
+    try {
+      await updateImage(focalTarget.id, { focal_x: point.x, focal_y: point.y })
+      await refresh()
+      setFocalTarget(null)
+    } catch (err) {
+      toast.error(friendlyError(err))
+    } finally {
+      setSavingFocal(false)
+    }
+  }
+
   const lightboxImages = images.map((img) => ({ url: img.image_url, alt: img.caption ?? '' }))
 
   return (
@@ -106,7 +123,14 @@ export default function PhotosPage() {
         <div className="flex flex-wrap justify-center gap-6 sm:justify-start">
           <AnimatePresence>
             {images.map((img, i) => (
-              <PolaroidCard key={img.id} image={img} index={i} onClick={() => setLightboxIndex(i)} onDelete={() => setDeleteTarget(img)} />
+              <PolaroidCard
+                key={img.id}
+                image={img}
+                index={i}
+                onClick={() => setLightboxIndex(i)}
+                onDelete={() => setDeleteTarget(img)}
+                onAdjust={() => setFocalTarget(img)}
+              />
             ))}
           </AnimatePresence>
         </div>
@@ -129,6 +153,15 @@ export default function PhotosPage() {
       </Modal>
 
       <Lightbox images={lightboxImages} index={lightboxIndex} onClose={() => setLightboxIndex(null)} onNavigate={setLightboxIndex} />
+
+      <FocalPointPicker
+        open={Boolean(focalTarget)}
+        imageUrl={focalTarget?.image_url ?? null}
+        initialFocalPoint={focalTarget ? { x: focalTarget.focal_x, y: focalTarget.focal_y } : undefined}
+        saving={savingFocal}
+        onSave={handleSaveFocalPoint}
+        onClose={() => setFocalTarget(null)}
+      />
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}

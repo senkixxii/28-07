@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { GripVertical, Star, Trash2 } from 'lucide-react'
+import { GripVertical, Move, Star, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Input'
 import ImageUploader, { type PendingImage } from '@/components/ui/ImageUploader'
+import FocalPointPicker from '@/components/ui/FocalPointPicker'
 import PhotoLayoutPicker from '@/components/anniversary/PhotoLayoutPicker'
 import { useAuth } from '@/contexts/AuthContext'
 import { useAnniversaries } from '@/hooks/useAnniversaries'
@@ -24,8 +25,14 @@ interface AnniversaryFormModalProps {
 export default function AnniversaryFormModal({ open, onClose, anniversary, onSaved }: AnniversaryFormModalProps) {
   const { user } = useAuth()
   const { settings } = useCoupleSettings()
-  const { createAnniversary, updateAnniversary, addAnniversaryImage, removeAnniversaryImage, reorderAnniversaryImages } =
-    useAnniversaries()
+  const {
+    createAnniversary,
+    updateAnniversary,
+    addAnniversaryImage,
+    removeAnniversaryImage,
+    reorderAnniversaryImages,
+    updateAnniversaryImage,
+  } = useAnniversaries()
   const isEdit = Boolean(anniversary)
 
   const [title, setTitle] = useState('')
@@ -38,6 +45,8 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
   const [photoLayout, setPhotoLayout] = useState<PhotoLayout>('single')
   const [saving, setSaving] = useState(false)
   const [dragId, setDragId] = useState<string | null>(null)
+  const [focalTarget, setFocalTarget] = useState<AnniversaryImage | null>(null)
+  const [savingFocal, setSavingFocal] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -91,6 +100,20 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
     }
   }
 
+  async function handleSaveFocalPoint(point: { x: number; y: number }) {
+    if (!focalTarget) return
+    setSavingFocal(true)
+    try {
+      await updateAnniversaryImage(focalTarget.id, { focal_x: point.x, focal_y: point.y })
+      setExistingImages((prev) => prev.map((i) => (i.id === focalTarget.id ? { ...i, focal_x: point.x, focal_y: point.y } : i)))
+      setFocalTarget(null)
+    } catch (err) {
+      toast.error(friendlyError(err))
+    } finally {
+      setSavingFocal(false)
+    }
+  }
+
   function handleReorder(fromId: string, toId: string) {
     if (fromId === toId) return
     setExistingImages((prev) => {
@@ -136,6 +159,8 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
             image_url: uploaded.imageUrl,
             storage_path: uploaded.storagePath,
             sort_order: existingImages.length + pending.indexOf(img),
+            focal_x: 50,
+            focal_y: 50,
           })
           if (!newCover) newCover = uploaded.imageUrl
           setPending((prev) => prev.map((p) => (p.id === img.id ? { ...p, status: 'done' } : p)))
@@ -199,7 +224,12 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
                   }}
                   className="group relative aspect-square cursor-grab overflow-hidden rounded-xl2 bg-black/5 active:cursor-grabbing"
                 >
-                  <img src={img.image_url} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={img.image_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: `${img.focal_x}% ${img.focal_y}%` }}
+                  />
                   <span className="absolute bottom-1 left-1 rounded-full bg-black/40 p-1 text-white opacity-0 group-hover:opacity-100">
                     <GripVertical className="h-3 w-3" />
                   </span>
@@ -212,6 +242,14 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
                     }`}
                   >
                     <Star className="h-3.5 w-3.5" fill={coverImageUrl === img.image_url ? 'currentColor' : 'none'} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFocalTarget(img)}
+                    aria-label="ปรับตำแหน่งรูป"
+                    className="absolute bottom-1 right-1 rounded-full bg-black/40 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <Move className="h-3.5 w-3.5" />
                   </button>
                   <button
                     type="button"
@@ -245,6 +283,15 @@ export default function AnniversaryFormModal({ open, onClose, anniversary, onSav
           </Button>
         </div>
       </form>
+
+      <FocalPointPicker
+        open={Boolean(focalTarget)}
+        imageUrl={focalTarget?.image_url ?? null}
+        initialFocalPoint={focalTarget ? { x: focalTarget.focal_x, y: focalTarget.focal_y } : undefined}
+        saving={savingFocal}
+        onSave={handleSaveFocalPoint}
+        onClose={() => setFocalTarget(null)}
+      />
     </Modal>
   )
 }

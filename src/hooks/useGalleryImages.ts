@@ -47,5 +47,10 @@ export function useGalleryImages() {
     if (err) throw err
   }, [])
 
-  return { images, loading, error, refresh, addImage, deleteImage }
+  const updateImage = useCallback(async (id: string, patch: { focal_x: number; focal_y: number }) => {
+    const { error: err } = await supabase.from('gallery_images').update(patch).eq('id', id)
+    if (err) throw err
+  }, [])
+
+  return { images, loading, error, refresh, addImage, deleteImage, updateImage }
 }

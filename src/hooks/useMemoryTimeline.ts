@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useAnniversaries } from './useAnniversaries'
 import { useLetters } from './useLetters'
 import { useGalleryImages } from './useGalleryImages'
+import type { MemoryPhoto } from '@/components/anniversary/MemoryPhotoLayout'
 import type { PhotoLayout } from '@/types'
 
 export type MemoryKind = 'anniversary' | 'letter' | 'photo'
@@ -12,7 +13,7 @@ export interface MemoryEntry {
   date: string
   title: string
   message: string | null
-  images: string[]
+  images: MemoryPhoto[]
   layout: PhotoLayout
   linkTo: string
 }
@@ -30,7 +31,7 @@ export function useMemoryTimeline() {
       date: a.anniversary_date,
       title: a.title,
       message: a.message,
-      images: a.anniversary_images.map((img) => img.image_url),
+      images: a.anniversary_images.map((img) => ({ url: img.image_url, focalX: img.focal_x, focalY: img.focal_y })),
       layout: a.photo_layout,
       linkTo: `/anniversaries/${a.id}`,
     }))
@@ -41,7 +42,7 @@ export function useMemoryTimeline() {
       date: l.letter_date,
       title: l.title,
       message: l.message,
-      images: l.image_url ? [l.image_url] : [],
+      images: l.image_url ? [{ url: l.image_url, focalX: l.image_focal_x, focalY: l.image_focal_y }] : [],
       layout: 'single',
       linkTo: '/letters',
     }))
@@ -52,7 +53,7 @@ export function useMemoryTimeline() {
       date: img.created_at,
       title: img.caption ?? '',
       message: null,
-      images: [img.image_url],
+      images: [{ url: img.image_url, focalX: img.focal_x, focalY: img.focal_y }],
       layout: 'single',
       linkTo: '/photos',
     }))

@@ -85,7 +85,7 @@ export default function MemoryBookPage() {
   }
 
   const Icon = KIND_META[current.kind].icon
-  const lightboxImages = current.images.map((url) => ({ url, alt: current.title }))
+  const lightboxImages = current.images.map((photo) => ({ url: photo.url, alt: current.title }))
   const progressPercent = ((currentIndex + 1) / entries.length) * 100
 
   return (

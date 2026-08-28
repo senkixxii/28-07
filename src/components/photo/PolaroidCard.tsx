@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Trash2 } from 'lucide-react'
+import { Move, Trash2 } from 'lucide-react'
 import type { GalleryImage } from '@/types'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
@@ -10,11 +10,13 @@ export default function PolaroidCard({
   index,
   onClick,
   onDelete,
+  onAdjust,
 }: {
   image: GalleryImage
   index: number
   onClick: () => void
   onDelete: () => void
+  onAdjust: () => void
 }) {
   const rotate = ROTATIONS[index % ROTATIONS.length]
   const reducedMotion = useReducedMotion()
@@ -39,6 +41,7 @@ export default function PolaroidCard({
           alt={image.caption ?? ''}
           loading="lazy"
           className="h-full w-full object-cover"
+          style={{ objectPosition: `${image.focal_x}% ${image.focal_y}%` }}
           whileHover={reducedMotion ? undefined : { scale: 1.08 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
         />
@@ -48,6 +51,17 @@ export default function PolaroidCard({
       </button>
 
       {image.caption && <p className="mt-2 truncate text-center text-xs text-ink-soft">{image.caption}</p>}
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onAdjust()
+        }}
+        aria-label="ปรับตำแหน่งรูป"
+        className="absolute left-1 top-1 rounded-full bg-black/40 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+      >
+        <Move className="h-3.5 w-3.5" />
+      </button>
 
       <button
         onClick={(e) => {

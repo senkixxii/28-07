@@ -81,6 +81,11 @@ export function useAnniversaries() {
     )
   }, [])
 
+  const updateAnniversaryImage = useCallback(async (id: string, patch: { focal_x: number; focal_y: number }) => {
+    const { error: err } = await supabase.from('anniversary_images').update(patch).eq('id', id)
+    if (err) throw err
+  }, [])
+
   return {
     anniversaries,
     loading,
@@ -92,6 +97,7 @@ export function useAnniversaries() {
     addAnniversaryImage,
     removeAnniversaryImage,
     reorderAnniversaryImages,
+    updateAnniversaryImage,
   }
 }
 
