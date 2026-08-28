@@ -1,0 +1,16 @@
+{
+  "name": "Our Little Love Book",
+  "short_name": "Love Book",
+  "description": "สมุดเล็ก ๆ ของเราสองคน",
+  "start_url": "/28-07/",
+  "scope": "/28-07/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8F0",
+  "theme_color": "#FFF8F0",
+  "lang": "th",
+  "icons": [
+    { "src": "/28-07/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/28-07/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
