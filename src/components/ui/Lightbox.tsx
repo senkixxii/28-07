@@ -1,7 +1,10 @@
-import { useEffect, useCallback, useRef, useState } from 'react'
+import { useEffect, useCallback, useRef, useState, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from 'lucide-react'
+import { toast } from 'sonner'
+import { ChevronLeft, ChevronRight, Download, Loader2, Share2, X, ZoomIn, ZoomOut } from 'lucide-react'
+import { downloadImageFromUrl, shareImageFromUrl } from '@/lib/shareImage'
+import { friendlyError } from '@/lib/supabase'
 
 interface LightboxProps {
   images: { url: string; alt?: string }[]
@@ -10,10 +13,17 @@ interface LightboxProps {
   onNavigate: (index: number) => void
 }
 
+function extensionFromUrl(url: string): string {
+  const match = /\.(jpe?g|png|webp|gif)(?:$|\?)/i.exec(url)
+  return match ? match[1].toLowerCase() : 'jpg'
+}
+
 export default function Lightbox({ images, index, onClose, onNavigate }: LightboxProps) {
   const open = index !== null
   const current = index !== null ? images[index] : null
   const [zoomed, setZoomed] = useState(false)
+  const [sharing, setSharing] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const didDragRef = useRef(false)
 
   const goPrev = useCallback(() => {
@@ -39,6 +49,36 @@ export default function Lightbox({ images, index, onClose, onNavigate }: Lightbo
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose, goPrev, goNext])
 
+  async function handleShare(e: MouseEvent) {
+    e.stopPropagation()
+    if (!current) return
+    setSharing(true)
+    try {
+      await shareImageFromUrl(current.url, {
+        filename: `love-book-photo.${extensionFromUrl(current.url)}`,
+        title: current.alt || undefined,
+      })
+    } catch (err) {
+      toast.error(friendlyError(err))
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  async function handleDownload(e: MouseEvent) {
+    e.stopPropagation()
+    if (!current) return
+    setDownloading(true)
+    try {
+      await downloadImageFromUrl(current.url, `love-book-photo.${extensionFromUrl(current.url)}`)
+      toast.success('บันทึกรูปภาพแล้วนะ')
+    } catch (err) {
+      toast.error(friendlyError(err))
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return createPortal(
     <AnimatePresence>
       {open && current && (
@@ -51,13 +91,31 @@ export default function Lightbox({ images, index, onClose, onNavigate }: Lightbo
           aria-modal="true"
           onClick={onClose}
         >
-          <button
-            onClick={onClose}
-            aria-label="ปิด"
-            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="absolute right-4 top-4 flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              disabled={sharing}
+              aria-label="แชร์รูปภาพ"
+              className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 disabled:opacity-60"
+            >
+              {sharing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Share2 className="h-5 w-5" />}
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={downloading}
+              aria-label="ดาวน์โหลดรูปภาพ"
+              className="rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 disabled:opacity-60"
+            >
+              {downloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+            </button>
+            <button
+              onClick={onClose}
+              aria-label="ปิด"
+              className="rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
 
           <button
             onClick={(e) => {
