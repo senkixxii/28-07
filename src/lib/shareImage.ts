@@ -1,6 +1,7 @@
 import { toBlob } from 'html-to-image'
 
-async function renderNodeToBlob(node: HTMLElement): Promise<Blob> {
+/** Renders `node` to a PNG blob so it can be previewed before sharing/saving. */
+export async function captureNodeImage(node: HTMLElement): Promise<Blob> {
   const blob = await toBlob(node, {
     cacheBust: true,
     pixelRatio: 2,
@@ -16,7 +17,7 @@ async function fetchImageBlob(url: string): Promise<Blob> {
   return res.blob()
 }
 
-function downloadBlob(blob: Blob, filename: string): void {
+export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -38,7 +39,7 @@ export interface ShareImageOptions {
  * sharing files, falling back to a plain download otherwise (or when sharing
  * itself fails for a reason other than the user simply closing the sheet).
  */
-async function shareOrDownloadBlob(blob: Blob, { filename, title, text }: ShareImageOptions): Promise<void> {
+export async function shareBlob(blob: Blob, { filename, title, text }: ShareImageOptions): Promise<void> {
   const file = new File([blob], filename, { type: blob.type || 'image/png' })
 
   if (navigator.canShare?.({ files: [file] })) {
@@ -55,26 +56,14 @@ async function shareOrDownloadBlob(blob: Blob, { filename, title, text }: ShareI
   downloadBlob(blob, filename)
 }
 
-/** Renders `node` to a PNG and always saves it as a plain file download. */
-export async function downloadImage(node: HTMLElement, filename: string): Promise<void> {
-  const blob = await renderNodeToBlob(node)
-  downloadBlob(blob, filename)
-}
-
-/** Renders `node` to a PNG and shares it (see shareOrDownloadBlob). */
-export async function shareImage(node: HTMLElement, options: ShareImageOptions): Promise<void> {
-  const blob = await renderNodeToBlob(node)
-  await shareOrDownloadBlob(blob, options)
-}
-
 /** Fetches the image at `url` and always saves it as a plain file download. */
 export async function downloadImageFromUrl(url: string, filename: string): Promise<void> {
   const blob = await fetchImageBlob(url)
   downloadBlob(blob, filename)
 }
 
-/** Fetches the image at `url` and shares it (see shareOrDownloadBlob). */
+/** Fetches the image at `url` and shares it (see shareBlob). */
 export async function shareImageFromUrl(url: string, options: ShareImageOptions): Promise<void> {
   const blob = await fetchImageBlob(url)
-  await shareOrDownloadBlob(blob, options)
+  await shareBlob(blob, options)
 }
