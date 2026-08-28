@@ -1,23 +1,48 @@
 import { toBlob } from 'html-to-image'
 
-export interface CaptureShareOptions {
-  filename: string
-  title?: string
-  text?: string
-}
-
-/**
- * Renders `node` to a PNG and either opens the native share sheet (when the
- * browser/device supports sharing files) or falls back to a plain download.
- */
-export async function captureAndShareImage(node: HTMLElement, { filename, title, text }: CaptureShareOptions): Promise<void> {
+async function renderNodeToBlob(node: HTMLElement): Promise<Blob> {
   const blob = await toBlob(node, {
     cacheBust: true,
     pixelRatio: 2,
     backgroundColor: '#FFFDFC',
   })
   if (!blob) throw new Error('สร้างรูปภาพไม่สำเร็จ')
+  return blob
+}
 
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+export interface ShareImageOptions {
+  filename: string
+  title?: string
+  text?: string
+}
+
+/**
+ * Renders `node` to a PNG and always saves it as a plain file download.
+ */
+export async function downloadImage(node: HTMLElement, filename: string): Promise<void> {
+  const blob = await renderNodeToBlob(node)
+  downloadBlob(blob, filename)
+}
+
+/**
+ * Renders `node` to a PNG and opens the native share sheet when the
+ * browser/device supports sharing files, falling back to a plain download
+ * when it doesn't (or when sharing itself fails for a reason other than the
+ * user simply closing the share sheet).
+ */
+export async function shareImage(node: HTMLElement, { filename, title, text }: ShareImageOptions): Promise<void> {
+  const blob = await renderNodeToBlob(node)
   const file = new File([blob], filename, { type: 'image/png' })
 
   if (navigator.canShare?.({ files: [file] })) {
@@ -31,12 +56,5 @@ export async function captureAndShareImage(node: HTMLElement, { filename, title,
     }
   }
 
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  URL.revokeObjectURL(url)
+  downloadBlob(blob, filename)
 }

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { ArrowLeft, Pencil, Share2, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Pencil, Share2, Trash2 } from 'lucide-react'
 import AppShell from '@/components/layout/AppShell'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -15,7 +15,7 @@ import { useAnniversary, useAnniversaries } from '@/hooks/useAnniversaries'
 import { useAuth } from '@/contexts/AuthContext'
 import { friendlyError } from '@/lib/supabase'
 import { deleteLoveBookFolder } from '@/lib/storage'
-import { captureAndShareImage } from '@/lib/shareImage'
+import { downloadImage, shareImage } from '@/lib/shareImage'
 import { formatThaiDate } from '@/lib/dates'
 
 const ROTATIONS = [-4, 3, -2, 4, -3, 2]
@@ -32,6 +32,7 @@ export default function AnniversaryDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   if (loading) {
@@ -77,7 +78,7 @@ export default function AnniversaryDetailPage() {
     if (!anniversary || !pageRef.current) return
     setSharing(true)
     try {
-      await captureAndShareImage(pageRef.current, {
+      await shareImage(pageRef.current, {
         // Some browsers mangle non-ASCII filenames on blob downloads, so keep
         // this part plain — the Thai title/text below still show up in the
         // native share sheet where Unicode works fine.
@@ -89,6 +90,19 @@ export default function AnniversaryDetailPage() {
       toast.error(friendlyError(err))
     } finally {
       setSharing(false)
+    }
+  }
+
+  async function handleDownload() {
+    if (!anniversary || !pageRef.current) return
+    setDownloading(true)
+    try {
+      await downloadImage(pageRef.current, `love-book-anniversary-${anniversary.month_number}.png`)
+      toast.success('บันทึกรูปภาพแล้วนะ')
+    } catch (err) {
+      toast.error(friendlyError(err))
+    } finally {
+      setDownloading(false)
     }
   }
 
@@ -165,7 +179,10 @@ export default function AnniversaryDetailPage() {
           <Pencil className="h-3.5 w-3.5" /> แก้ไข
         </Button>
         <Button variant="ghost" size="sm" onClick={handleShare} loading={sharing}>
-          {!sharing && <Share2 className="h-3.5 w-3.5" />} แชร์เป็นรูปภาพ
+          {!sharing && <Share2 className="h-3.5 w-3.5" />} แชร์
+        </Button>
+        <Button variant="ghost" size="sm" onClick={handleDownload} loading={downloading}>
+          {!downloading && <Download className="h-3.5 w-3.5" />} ดาวน์โหลด
         </Button>
         <Button variant="danger" size="sm" onClick={() => setConfirmOpen(true)}>
           <Trash2 className="h-3.5 w-3.5" /> ลบ
