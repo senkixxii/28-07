@@ -3,10 +3,14 @@ import { formatThaiDate } from '@/lib/dates'
 import { SHARE_ASPECT_RATIOS, type FocalPoint, type ShareAspectRatio } from '@/lib/shareCardLayout'
 import type { AnniversaryWithImages } from '@/types'
 
+export type SharePhotoLayout = 'single' | 'grid'
+
 interface AnniversaryShareCardProps {
   anniversary: AnniversaryWithImages
   aspectRatio: ShareAspectRatio
+  photoLayout: SharePhotoLayout
   heroUrl: string | null
+  photoUrls: string[]
   focalPoint: FocalPoint
 }
 
@@ -15,13 +19,15 @@ interface AnniversaryShareCardProps {
  * separate from the on-screen page so the export always comes out with a
  * consistent, deliberately-chosen shape instead of however tall the
  * responsive on-screen layout happens to stack on the viewer's phone.
- * aspectRatio/heroUrl/focalPoint are user-adjustable via ShareCustomizeDialog.
+ * aspectRatio/photoLayout/heroUrl/photoUrls/focalPoint are all
+ * user-adjustable via ShareCustomizeDialog.
  */
 const AnniversaryShareCard = forwardRef<HTMLDivElement, AnniversaryShareCardProps>(function AnniversaryShareCard(
-  { anniversary, aspectRatio, heroUrl, focalPoint },
+  { anniversary, aspectRatio, photoLayout, heroUrl, photoUrls, focalPoint },
   ref,
 ) {
   const { width, height, photoHeight, messageLines } = SHARE_ASPECT_RATIOS[aspectRatio]
+  const gridPhotos = photoUrls.slice(0, 4)
 
   return (
     <div
@@ -30,7 +36,21 @@ const AnniversaryShareCard = forwardRef<HTMLDivElement, AnniversaryShareCardProp
       className="flex flex-col overflow-hidden bg-warm-white"
     >
       <div style={{ height: photoHeight }} className="relative w-full shrink-0 overflow-hidden bg-soft-pink/40">
-        {heroUrl ? (
+        {photoLayout === 'grid' && gridPhotos.length > 0 ? (
+          <div
+            className="grid h-full w-full gap-1"
+            style={{ gridTemplateColumns: gridPhotos.length > 1 ? 'repeat(2, 1fr)' : '1fr' }}
+          >
+            {gridPhotos.map((url, i) => {
+              const isLastOdd = gridPhotos.length % 2 === 1 && i === gridPhotos.length - 1
+              return (
+                <div key={url + i} className="overflow-hidden bg-black/5" style={isLastOdd ? { gridColumn: 'span 2' } : undefined}>
+                  <img src={url} alt="" className="h-full w-full object-cover" />
+                </div>
+              )
+            })}
+          </div>
+        ) : heroUrl ? (
           <img
             src={heroUrl}
             alt={anniversary.title}

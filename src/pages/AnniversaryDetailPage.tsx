@@ -12,7 +12,7 @@ import ShareCustomizeDialog from '@/components/ui/ShareCustomizeDialog'
 import Lightbox from '@/components/ui/Lightbox'
 import PageLoader from '@/components/bear/PageLoader'
 import AnniversaryFormModal from '@/components/anniversary/AnniversaryFormModal'
-import AnniversaryShareCard from '@/components/anniversary/AnniversaryShareCard'
+import AnniversaryShareCard, { type SharePhotoLayout } from '@/components/anniversary/AnniversaryShareCard'
 import MemoryPhotoLayout from '@/components/anniversary/MemoryPhotoLayout'
 import { useAnniversary, useAnniversaries } from '@/hooks/useAnniversaries'
 import { useAuth } from '@/contexts/AuthContext'
@@ -43,6 +43,8 @@ export default function AnniversaryDetailPage() {
   const [aspectRatio, setAspectRatio] = useState<ShareAspectRatio>('story')
   const [heroUrl, setHeroUrl] = useState<string | null>(null)
   const [focalPoint, setFocalPoint] = useState<FocalPoint>(DEFAULT_FOCAL_POINT)
+  const [photoLayout, setPhotoLayout] = useState<SharePhotoLayout>('single')
+  const [selectedPhotos, setSelectedPhotos] = useState<string[]>([])
 
   if (loading) {
     return (
@@ -90,12 +92,19 @@ export default function AnniversaryDetailPage() {
 
   function handleOpenCustomize() {
     setHeroUrl((current) => current ?? cover)
+    setSelectedPhotos((current) => (current.length > 0 ? current : photoOptions.slice(0, 4)))
     setCustomizeOpen(true)
   }
 
   function handleSelectHero(url: string) {
     setHeroUrl(url)
     setFocalPoint(DEFAULT_FOCAL_POINT)
+  }
+
+  function handleTogglePhoto(url: string) {
+    setSelectedPhotos((current) =>
+      current.includes(url) ? current.filter((u) => u !== url) : current.length >= 4 ? current : [...current, url],
+    )
   }
 
   async function handleConfirmCustomize() {
@@ -194,7 +203,15 @@ export default function AnniversaryDetailPage() {
           image — keeps the export a consistent shape regardless of how the
           responsive page above happens to stack on the viewer's screen. */}
       <div style={{ position: 'fixed', top: 0, left: -99999 }} aria-hidden="true">
-        <AnniversaryShareCard ref={shareCardRef} anniversary={anniversary} aspectRatio={aspectRatio} heroUrl={heroUrl} focalPoint={focalPoint} />
+        <AnniversaryShareCard
+          ref={shareCardRef}
+          anniversary={anniversary}
+          aspectRatio={aspectRatio}
+          photoLayout={photoLayout}
+          heroUrl={heroUrl}
+          photoUrls={selectedPhotos}
+          focalPoint={focalPoint}
+        />
       </div>
 
       <ShareCustomizeDialog
@@ -210,8 +227,19 @@ export default function AnniversaryDetailPage() {
         photoOptions={photoOptions}
         selectedPhoto={heroUrl}
         onSelectPhoto={handleSelectHero}
+        photoLayout={photoLayout}
+        onPhotoLayoutChange={setPhotoLayout}
+        selectedPhotos={selectedPhotos}
+        onTogglePhoto={handleTogglePhoto}
       >
-        <AnniversaryShareCard anniversary={anniversary} aspectRatio={aspectRatio} heroUrl={heroUrl} focalPoint={focalPoint} />
+        <AnniversaryShareCard
+          anniversary={anniversary}
+          aspectRatio={aspectRatio}
+          photoLayout={photoLayout}
+          heroUrl={heroUrl}
+          photoUrls={selectedPhotos}
+          focalPoint={focalPoint}
+        />
       </ShareCustomizeDialog>
 
       <ImagePreviewDialog

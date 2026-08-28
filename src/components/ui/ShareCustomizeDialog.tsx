@@ -7,6 +7,9 @@ import { SHARE_ASPECT_RATIOS, type FocalPoint, type ShareAspectRatio } from '@/l
 import { cn } from '@/lib/utils'
 
 const PREVIEW_WIDTH = 260
+const MAX_GRID_PHOTOS = 4
+
+type PhotoLayout = 'single' | 'grid'
 
 interface ShareCustomizeDialogProps {
   open: boolean
@@ -21,6 +24,12 @@ interface ShareCustomizeDialogProps {
   photoOptions?: string[]
   selectedPhoto?: string | null
   onSelectPhoto?: (url: string) => void
+  /** When provided (2+ photos available), shows a เดี่ยว/หลายรูป toggle
+   * and switches the thumbnail row to multi-select for the grid layout. */
+  photoLayout?: PhotoLayout
+  onPhotoLayoutChange?: (layout: PhotoLayout) => void
+  selectedPhotos?: string[]
+  onTogglePhoto?: (url: string) => void
   /** The live ShareCard component instance, rendered at its real 1080px width — this dialog scales it down for display. */
   children: ReactNode
 }
@@ -44,6 +53,10 @@ export default function ShareCustomizeDialog({
   photoOptions,
   selectedPhoto,
   onSelectPhoto,
+  photoLayout,
+  onPhotoLayoutChange,
+  selectedPhotos,
+  onTogglePhoto,
   children,
 }: ShareCustomizeDialogProps) {
   const dragging = useRef(false)
@@ -51,6 +64,7 @@ export default function ShareCustomizeDialog({
   const scale = PREVIEW_WIDTH / width
   const previewHeight = height * scale
   const photoPreviewHeight = photoHeight * scale
+  const isGrid = photoLayout === 'grid'
 
   function updateFocalPointFromEvent(e: PointerEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -120,11 +134,33 @@ export default function ShareCustomizeDialog({
               ))}
             </div>
 
+            {onPhotoLayoutChange && photoOptions && photoOptions.length > 1 && (
+              <div className="mb-4 flex justify-center gap-1.5 rounded-full bg-black/5 p-1">
+                {(
+                  [
+                    { key: 'single' as const, label: 'รูปเดียว' },
+                    { key: 'grid' as const, label: 'หลายรูป' },
+                  ]
+                ).map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => onPhotoLayoutChange(key)}
+                    className={cn(
+                      'flex-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors',
+                      (photoLayout ?? 'single') === key ? 'bg-warm-white text-ink shadow-softer' : 'text-ink-soft hover:text-ink',
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="mx-auto mb-4 overflow-hidden rounded-xl2 border border-black/5 shadow-softer" style={{ width: PREVIEW_WIDTH }}>
               <div style={{ width: PREVIEW_WIDTH, height: previewHeight, position: 'relative', overflow: 'hidden' }}>
                 <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>{children}</div>
 
-                {hasPhoto && (
+                {hasPhoto && !isGrid && (
                   <div
                     onPointerDown={handlePointerDown}
                     onPointerMove={handlePointerMove}
@@ -142,21 +178,28 @@ export default function ShareCustomizeDialog({
             </div>
 
             {photoOptions && photoOptions.length > 1 && (
-              <div className="mb-4 flex justify-center gap-2">
-                {photoOptions.map((url) => (
-                  <button
-                    key={url}
-                    onClick={() => onSelectPhoto?.(url)}
-                    className={cn(
-                      'h-12 w-12 overflow-hidden rounded-lg border-2 transition-all',
-                      selectedPhoto === url ? 'border-accent' : 'border-transparent opacity-70 hover:opacity-100',
-                    )}
-                  >
-                    <img src={url} alt="" className="h-full w-full object-cover" />
-                  </button>
-                ))}
+              <div className="mb-4 flex flex-wrap justify-center gap-2">
+                {photoOptions.map((url) => {
+                  const isSelected = isGrid ? (selectedPhotos ?? []).includes(url) : selectedPhoto === url
+                  const gridFull = isGrid && !isSelected && (selectedPhotos ?? []).length >= MAX_GRID_PHOTOS
+                  return (
+                    <button
+                      key={url}
+                      disabled={gridFull}
+                      onClick={() => (isGrid ? onTogglePhoto?.(url) : onSelectPhoto?.(url))}
+                      className={cn(
+                        'h-12 w-12 overflow-hidden rounded-lg border-2 transition-all',
+                        isSelected ? 'border-accent' : 'border-transparent opacity-70 hover:opacity-100',
+                        gridFull && 'cursor-not-allowed opacity-30',
+                      )}
+                    >
+                      <img src={url} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  )
+                })}
               </div>
             )}
+            {isGrid && <p className="-mt-2 mb-4 text-center text-[11px] text-ink-muted">เลือกได้สูงสุด {MAX_GRID_PHOTOS} รูป</p>}
 
             <div className="flex justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={onClose}>
