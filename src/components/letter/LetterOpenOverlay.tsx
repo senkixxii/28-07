@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Pencil, Share2, Trash2, X } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import ImagePreviewDialog from '@/components/ui/ImagePreviewDialog'
+import LetterShareCard from '@/components/letter/LetterShareCard'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { captureNodeImage } from '@/lib/shareImage'
 import { friendlyError } from '@/lib/supabase'
@@ -28,6 +29,7 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
   const [capturing, setCapturing] = useState(false)
   const [previewBlob, setPreviewBlob] = useState<Blob | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const shareCardRef = useRef<HTMLDivElement>(null)
 
   const lines = letter?.message.split('\n') ?? []
 
@@ -37,10 +39,10 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
   }
 
   async function handlePreviewShare() {
-    if (!letter || !contentRef.current) return
+    if (!letter || !shareCardRef.current) return
     setCapturing(true)
     try {
-      const blob = await captureNodeImage(contentRef.current)
+      const blob = await captureNodeImage(shareCardRef.current)
       setPreviewBlob(blob)
     } catch (err) {
       toast.error(friendlyError(err))
@@ -149,15 +151,23 @@ export default function LetterOpenOverlay({ letter, onClose, onEdit, onDelete }:
       )}
 
       {letter && (
-        <ImagePreviewDialog
-          blob={previewBlob}
-          onClose={() => setPreviewBlob(null)}
-          options={{
-            filename: `love-book-letter-${letter.letter_date}.png`,
-            title: letter.title,
-            text: `${letter.title} · ${formatThaiDate(letter.letter_date)}`,
-          }}
-        />
+        <>
+          {/* Off-screen, fixed-size layout used only to generate the
+              shareable image — see AnniversaryShareCard for why. */}
+          <div style={{ position: 'fixed', top: 0, left: -99999 }} aria-hidden="true">
+            <LetterShareCard ref={shareCardRef} letter={letter} />
+          </div>
+
+          <ImagePreviewDialog
+            blob={previewBlob}
+            onClose={() => setPreviewBlob(null)}
+            options={{
+              filename: `love-book-letter-${letter.letter_date}.png`,
+              title: letter.title,
+              text: `${letter.title} · ${formatThaiDate(letter.letter_date)}`,
+            }}
+          />
+        </>
       )}
     </>
   )

@@ -11,6 +11,7 @@ import ImagePreviewDialog from '@/components/ui/ImagePreviewDialog'
 import Lightbox from '@/components/ui/Lightbox'
 import PageLoader from '@/components/bear/PageLoader'
 import AnniversaryFormModal from '@/components/anniversary/AnniversaryFormModal'
+import AnniversaryShareCard from '@/components/anniversary/AnniversaryShareCard'
 import MemoryPhotoLayout from '@/components/anniversary/MemoryPhotoLayout'
 import { useAnniversary, useAnniversaries } from '@/hooks/useAnniversaries'
 import { useAuth } from '@/contexts/AuthContext'
@@ -28,6 +29,7 @@ export default function AnniversaryDetailPage() {
   const { deleteAnniversary } = useAnniversaries()
   const navigate = useNavigate()
   const pageRef = useRef<HTMLDivElement>(null)
+  const shareCardRef = useRef<HTMLDivElement>(null)
 
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -76,10 +78,10 @@ export default function AnniversaryDetailPage() {
   }
 
   async function handlePreviewShare() {
-    if (!anniversary || !pageRef.current) return
+    if (!anniversary || !shareCardRef.current) return
     setCapturing(true)
     try {
-      const blob = await captureNodeImage(pageRef.current)
+      const blob = await captureNodeImage(shareCardRef.current)
       setPreviewBlob(blob)
     } catch (err) {
       toast.error(friendlyError(err))
@@ -169,6 +171,13 @@ export default function AnniversaryDetailPage() {
       </div>
 
       <Lightbox images={images} index={lightboxIndex} onClose={() => setLightboxIndex(null)} onNavigate={setLightboxIndex} />
+
+      {/* Off-screen, fixed-size layout used only to generate the shareable
+          image — keeps the export a consistent shape regardless of how the
+          responsive page above happens to stack on the viewer's screen. */}
+      <div style={{ position: 'fixed', top: 0, left: -99999 }} aria-hidden="true">
+        <AnniversaryShareCard ref={shareCardRef} anniversary={anniversary} />
+      </div>
 
       <ImagePreviewDialog
         blob={previewBlob}
